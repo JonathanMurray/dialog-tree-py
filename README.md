@@ -3,8 +3,9 @@
 A lightweight library/tool for building dialog trees and visual novels with Pygame.
 
 <p align="middle">
-    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_dragonball.png" width="40%" />
-    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_wikipedia_example.png" width="40%" />
+    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_wikipedia_json.png" width="32%" />
+    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_dragonball.png" width="32%" />
+    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_wikipedia_example.png" width="32%" />
 </p>
 
 Create your own dialog experience with custom images, text and graph structure, using a simple
@@ -13,7 +14,7 @@ of images (like a slideshow or non-interactive visual novel, if you will), or ta
 the configuration and define exactly how the dialog nodes are connected to each other.
 
 Note that this project is still early in development and may be missing features that seem like
-no-brainers. Contributions are very welcome and encouraged!
+no-brainers. Contributions are welcome and encouraged!
 
 ## Installation
 
@@ -27,7 +28,7 @@ pip3 install -r requirements.txt
 
 ## Usage
 
-To try a dialog, use:
+To run a dialog, use:
 
 ```bash
 python3 dialog_tree wikipedia_example.json
