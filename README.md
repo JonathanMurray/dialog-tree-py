@@ -2,8 +2,10 @@
 
 A lightweight library/tool for building dialog trees and visual novels with Pygame.
 
-<img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_dragonball.png" height="300" />
-<br/>
+<p align="middle">
+    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_dragonball.png" width="40%" />
+    <img src="https://github.com/JonathanMurray/dialog-tree-py/blob/master/screenshots/screenshot_wikipedia_example.png" width="40%" />
+</p>
 
 Create your own dialog experience with custom images, text and graph structure, using a simple
 JSON configuration file. By using different JSON schemas you can either generate a simple sequence
