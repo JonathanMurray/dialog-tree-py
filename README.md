@@ -56,3 +56,6 @@ Pull requests (and feature requests) are welcome and encouraged!
 Please make sure to update tests as appropriate.
 
 If adding image resources to repository, try to keep them small to reduce the byte size.
+
+## License
+[MIT](LICENSE.txt)
