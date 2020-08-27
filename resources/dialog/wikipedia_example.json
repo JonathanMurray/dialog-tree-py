@@ -1,0 +1,97 @@
+{
+  "title": "en.wikipedia.org/wiki/Dialogue_tree",
+  "graph": {
+    "root": "START",
+    "nodes": [
+      {
+        "id": "START",
+        "text": "You don't look like you're from around here.",
+        "image": "lawyer_neutral",
+        "choices": [
+          [
+            "I've lived here all my life!",
+            "MR_BOWLER_QUESTION"
+          ],
+          [
+            "I came here from Newton.",
+            "NEWTON_TROUBLE_QUESTION"
+          ]
+        ]
+      },
+      {
+        "id": "MR_BOWLER_QUESTION",
+        "text": "Oh really? Then you must know Mr. Bowler.",
+        "image": "lawyer_forward",
+        "choices": [
+          [
+            "Mr. Bowler is a good friend of mine!",
+            "LIAR"
+          ],
+          [
+            "Who?",
+            "DONT_WORRY"
+          ]
+        ]
+      },
+      {
+        "id": "NEWTON_TROUBLE_QUESTION",
+        "text": "Newton, eh? I heard there's trouble brewing down there.",
+        "image": "lawyer_forward",
+        "choices": [
+          [
+            "I haven't heard about any trouble.",
+            "DONT_WORRY"
+          ],
+          [
+            "Did I say Newton? I'm actually from Springville.",
+            "MR_BOWLER_QUESTION"
+          ]
+        ]
+      },
+      {
+        "id": "LIAR",
+        "text": "You liar! There ain't no Mr. Bowler. I made him up!",
+        "image": "lawyer_pointing",
+        "choices": [
+          [
+            "...",
+            "GAME_OVER"
+          ]
+        ]
+      },
+      {
+        "id": "DONT_WORRY",
+        "text": "Don't you worry about it. Say, do you have something to eat? I'm starving.",
+        "image": "lawyer_neutral",
+        "choices": [
+          [
+            "...",
+            "VICTORY"
+          ]
+        ]
+      },
+      {
+        "id": "GAME_OVER",
+        "text": "[GAME OVER]",
+        "image": "lawyer_pointing",
+        "choices": [
+          [
+            "Start over.",
+            "START"
+          ]
+        ]
+      },
+      {
+        "id": "VICTORY",
+        "text": "[YOU WON]",
+        "image": "lawyer_neutral",
+        "choices": [
+          [
+            "Play again.",
+            "START"
+          ]
+        ]
+      }
+    ]
+  }
+}
