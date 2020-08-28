@@ -48,7 +48,6 @@ def _init_tmp_dir():
 
 def main():
     args = sys.argv[1:]
-    print(sys.argv)
     dialog_filename = args[0] if args else "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
     _init_tmp_dir()
