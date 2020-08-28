@@ -85,7 +85,7 @@ class TextBox(Component):
         return self._cursor == self._max_cursor_position
 
     def _split_into_lines(self, text) -> List[str]:
-        return list(layout_text_in_area(text, self._font.size, self._text_area.width))
+        return list(layout_text_in_area(text, lambda t: self._font.size(t)[0], self._text_area.width))
 
     def _redraw(self):
         self.surface.fill(BLACK)
@@ -103,7 +103,7 @@ class TextBox(Component):
             num_chars_rendered += len(part_of_line)
 
 
-def layout_text_in_area(text: str, font: Callable[[str], Vec2], width: int) -> Iterator[str]:
+def layout_text_in_area(text: str, font_width: Callable[[str], int], width: int) -> Iterator[str]:
     start = 0
     end = 0
 
@@ -121,7 +121,7 @@ def layout_text_in_area(text: str, font: Callable[[str], Vec2], width: int) -> I
             yield text[start:]
             return
         substr = text[start:end + 1]
-        overflow = font(substr)[0] > width
+        overflow = font_width(substr) > width
         if overflow:
             # we have a substring [start->end] that is wider than allowed
             if text[end] == ' ':
