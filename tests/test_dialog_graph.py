@@ -24,7 +24,7 @@ def test_reject_missing_root():
 
 def test_initial_state():
     graph = DialogGraph("START", [DialogNode("START", "Hello!", "::image::", [DialogChoice("Good bye!", "START")])])
-    assert graph.get_state() == ("Hello!", "::image::", ["Good bye!"])
+    assert graph.get_current_state() == ("Hello!", "::image::", ["Good bye!"])
 
 
 def test_state_after_making_choice():
@@ -33,4 +33,4 @@ def test_state_after_making_choice():
         DialogNode("END", "It's over.", "::image::", []),
     ])
     graph.make_choice(0)
-    assert graph.get_state() == ("It's over.", "::image::", [])
+    assert graph.get_current_state() == ("It's over.", "::image::", [])

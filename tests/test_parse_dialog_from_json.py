@@ -20,9 +20,9 @@ def test_load_simple_sequence():
     }
     dialog_graph = parse_dialog_from_json(dialog_json)
 
-    assert dialog_graph.get_state() == ("text 1", "image 1", ["Next"])
+    assert dialog_graph.get_current_state() == ("text 1", "image 1", ["Next"])
     dialog_graph.make_choice(0)
-    assert dialog_graph.get_state() == ("text 2", "image 2", ["Play from beginning"])
+    assert dialog_graph.get_current_state() == ("text 2", "image 2", ["Play from beginning"])
 
 
 def test_load_graph():
@@ -61,6 +61,6 @@ def test_load_graph():
     }
     dialog_graph = parse_dialog_from_json(dialog_json)
 
-    assert dialog_graph.get_state() == ("text 1", "image 1", ["stay here", "go next"])
+    assert dialog_graph.get_current_state() == ("text 1", "image 1", ["stay here", "go next"])
     dialog_graph.make_choice(1)
-    assert dialog_graph.get_state() == ("text 2", "image 2", ["go back"])
+    assert dialog_graph.get_current_state() == ("text 2", "image 2", ["go back"])

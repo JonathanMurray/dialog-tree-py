@@ -37,7 +37,7 @@ class DialogGraph:
         if root_id not in self._nodes_by_id:
             raise ValueError(f"No node found with ID: {root_id}")
 
-    def get_state(self) -> Tuple[str, str, List[str]]:
+    def get_current_state(self) -> Tuple[str, str, List[str]]:
         """Get dialog text, image ID and a list of choices"""
         node = self._nodes_by_id[self._active_node_id]
         return node.text, node.image_id, [c.text for c in node.choices]

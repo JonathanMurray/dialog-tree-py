@@ -22,7 +22,7 @@ class Game:
         self._images = images
         self._dialog_graph = dialog_graph
 
-        text, self._active_image_id, self._choice_texts = self._dialog_graph.get_state()
+        text, self._active_image_id, self._choice_texts = self._dialog_graph.get_current_state()
 
         self._setup_ui_with_dialog(text)
 
@@ -85,7 +85,7 @@ class Game:
     def _make_choice(self):
         if self._choice_buttons:
             self._dialog_graph.make_choice(self._active_choice_index)
-            dialog_text, self._active_image_id, self._choice_texts = self._dialog_graph.get_state()
+            dialog_text, self._active_image_id, self._choice_texts = self._dialog_graph.get_current_state()
             self._setup_ui_with_dialog(dialog_text)
 
     def _render(self):
