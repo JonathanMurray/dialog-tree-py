@@ -9,17 +9,19 @@ class DialogChoice:
 
 class AnimationRef:
 
-    def __init__(self, directory: Optional[str] = None, image_ids: Optional[List[str]] = None):
+    def __init__(self, directory: Optional[str] = None, image_ids: Optional[List[str]] = None,
+        offset: Optional[Tuple[int, int]] = None):
         self.directory = directory
         self.image_ids = image_ids
+        self.offset: Tuple[int, int] = offset or (0, 0)
 
     @staticmethod
-    def of_directory(directory: str):
-        return AnimationRef(directory=directory)
+    def of_directory(directory: str, offset: Optional[Tuple[int, int]] = None):
+        return AnimationRef(directory=directory, offset=offset)
 
     @staticmethod
-    def of_image_ids(image_ids: List[str]):
-        return AnimationRef(image_ids=image_ids)
+    def of_image_ids(image_ids: List[str], offset: Optional[Tuple[int, int]] = None):
+        return AnimationRef(image_ids=image_ids, offset=offset)
 
 
 class DialogNode:
@@ -36,10 +38,9 @@ class DialogNode:
 
 class Dialog:
     def __init__(self, root_node_id: str, nodes: List[DialogNode], title: Optional[str] = None,
-        background_image_id: Optional[str] = None, foreground_offset: Tuple[int, int] = None):
+        background_image_id: Optional[str] = None):
         self.title = title
         self.background_image_id = background_image_id
-        self.foreground_offset = foreground_offset or (0, 0)
         self._nodes_by_id: Dict[str, DialogNode] = {}
         self._active_node_id = root_node_id
         for node in nodes:

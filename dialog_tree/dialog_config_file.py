@@ -20,7 +20,6 @@ def parse_dialog_from_json(dialog_json: Dict) -> Dialog:
 
     dialog_graph.title = dialog_json.get("title", None)
     dialog_graph.background_image_id = dialog_json.get("background_image_id", None)
-    dialog_graph.foreground_offset = dialog_json.get("foreground_offset", (0, 0))
     return dialog_graph
 
 
@@ -47,12 +46,13 @@ def _parse_graph_json(graph_json) -> Dialog:
         return DialogChoice(array[0], array[1])
 
     def parse_node(node) -> DialogNode:
-        if "image" in node:
-            animation_ref = AnimationRef.of_image_ids([node["image"]])
-        elif "animation" in node:
-            animation_ref = AnimationRef.of_image_ids(node["animation"])
-        elif "animation_dir" in node:
-            animation_ref = AnimationRef.of_directory(node["animation_dir"])
+        graphics = node["graphics"]
+        if "image" in graphics:
+            animation_ref = AnimationRef.of_image_ids([graphics["image"]], graphics.get("offset", None))
+        elif "animation" in graphics:
+            animation_ref = AnimationRef.of_image_ids(graphics["animation"], graphics.get("offset", None))
+        elif "animation_dir" in graphics:
+            animation_ref = AnimationRef.of_directory(graphics["animation_dir"], graphics.get("offset", None))
         else:
             raise ValueError(f"Missing image/animation config for node!")
         return DialogNode(

@@ -46,9 +46,9 @@ class Game:
         animation_ref = self._current_dialog_node.animation_ref
         if animation_ref.image_ids:
             animation = Animation([self._images[i] for i in animation_ref.image_ids],
-                                  self._dialog_graph.foreground_offset)
+                                  animation_ref.offset)
         else:
-            animation = Animation(self._animations[animation_ref.directory], self._dialog_graph.foreground_offset)
+            animation = Animation(self._animations[animation_ref.directory], animation_ref.offset)
         self._picture_component = Picture(background, animation)
         components = [
             (self._picture_component, (margin, margin)),
