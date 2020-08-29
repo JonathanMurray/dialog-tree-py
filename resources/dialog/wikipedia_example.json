@@ -30,7 +30,7 @@
         "choices": [
           [
             "Mr. Bowler is a good friend of mine!",
-            "LIAR"
+            "LIAR_1"
           ],
           [
             "Who?",
@@ -54,9 +54,20 @@
         ]
       },
       {
-        "id": "LIAR",
-        "text": "You liar! There ain't no Mr. Bowler. I made him up!",
+        "id": "LIAR_1",
+        "text": "",
         "sound": "hold_it",
+        "image": "hold_it",
+        "choices": [
+          [
+            "...",
+            "LIAR_2"
+          ]
+        ]
+      },
+      {
+        "id": "LIAR_2",
+        "text": "You liar! There ain't no Mr. Bowler. I made him up!",
         "animation_dir": "lawyer_forward",
         "choices": [
           [
@@ -78,9 +89,9 @@
       },
       {
         "id": "GAME_OVER",
-        "text": "[GAME OVER]",
+        "text": "",
         "sound": "take_that",
-        "animation_dir": "lawyer_pointing",
+        "image": "take_that",
         "choices": [
           [
             "Start over.",

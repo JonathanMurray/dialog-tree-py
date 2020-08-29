@@ -116,7 +116,7 @@ class TextBox(Component):
         self._blip_sound = blip_sound
         self._lines = self._split_into_lines(text)
         self._cursor = 0
-        self._max_cursor_position = len(text) - 1
+        self._max_cursor_position = max(0, len(text) - 1)
         self._periodic_cursor_advance = PeriodicAction(Millis(40), self._advance_cursor)
 
         self._redraw()
@@ -153,9 +153,12 @@ class TextBox(Component):
 
 
 def layout_text_in_area(text: str, font_width: Callable[[str], int], width: int) -> Iterator[str]:
+    if len(text) == 0:
+        yield ""
+        return
+
     start = 0
     end = 0
-
     while True:
 
         if text[start] == ' ':

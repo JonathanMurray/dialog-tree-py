@@ -25,8 +25,8 @@ class AnimationRef:
 class DialogNode:
     def __init__(self, node_id: str, text: str, animation_ref: AnimationRef, choices: List[DialogChoice],
         sound_id: Optional[str] = None):
-        if not node_id or not text:
-            raise ValueError("Invalid node config")
+        if not node_id:
+            raise ValueError("Invalid node config (missing ID)")
         self.node_id = node_id
         self.text = text
         self.animation_ref = animation_ref
