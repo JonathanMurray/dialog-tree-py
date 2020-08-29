@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional, Dict
+from typing import List, Optional, Dict
 
 
 class DialogChoice:
@@ -8,12 +8,12 @@ class DialogChoice:
 
 
 class DialogNode:
-    def __init__(self, node_id: str, text: str, image_id: str, choices: List[DialogChoice]):
+    def __init__(self, node_id: str, text: str, animation_image_ids: List[str], choices: List[DialogChoice]):
         if not node_id or not text:
             raise ValueError("Invalid node config")
         self.node_id = node_id
         self.text = text
-        self.image_id = image_id
+        self.animation_image_ids = animation_image_ids
         self.choices = choices
 
 
@@ -37,10 +37,8 @@ class DialogGraph:
         if root_id not in self._nodes_by_id:
             raise ValueError(f"No node found with ID: {root_id}")
 
-    def get_current_state(self) -> Tuple[str, str, List[str]]:
-        """Get dialog text, image ID and a list of choices"""
-        node = self._nodes_by_id[self._active_node_id]
-        return node.text, node.image_id, [c.text for c in node.choices]
+    def current_node(self) -> DialogNode:
+        return self._nodes_by_id[self._active_node_id]
 
     def make_choice(self, choice_index: int):
         node = self._nodes_by_id[self._active_node_id]

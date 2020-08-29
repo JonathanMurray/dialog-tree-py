@@ -5,8 +5,8 @@ from graph_visualization import generate_graphviz
 def test_simple_graphviz():
     dialog_graph = DialogGraph(
         root_id="ROOT_NODE",
-        nodes=[DialogNode("ROOT_NODE", "Start text", "some_image.png", [DialogChoice("Choice text", "OTHER_NODE")]),
-               DialogNode("OTHER_NODE", "Other text", "other_image.png", [])]
+        nodes=[DialogNode("ROOT_NODE", "Start text", ["some_image.png"], [DialogChoice("Choice text", "OTHER_NODE")]),
+               DialogNode("OTHER_NODE", "Other text", ["other_image.png"], [])]
     )
 
     graph = generate_graphviz("Some name", dialog_graph)

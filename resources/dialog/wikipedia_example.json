@@ -6,7 +6,10 @@
       {
         "id": "START",
         "text": "You don't look like you're from around here.",
-        "image": "lawyer_neutral",
+        "animation": [
+          "lawyer_thinking_00",
+          "lawyer_thinking_01"
+        ],
         "choices": [
           [
             "I've lived here all my life!",
@@ -21,7 +24,10 @@
       {
         "id": "MR_BOWLER_QUESTION",
         "text": "Oh really? Then you must know Mr. Bowler.",
-        "image": "lawyer_forward",
+        "animation": [
+          "lawyer_forward_00",
+          "lawyer_forward_01"
+        ],
         "choices": [
           [
             "Mr. Bowler is a good friend of mine!",
@@ -36,7 +42,11 @@
       {
         "id": "NEWTON_TROUBLE_QUESTION",
         "text": "Newton, eh? I heard there's trouble brewing down there.",
-        "image": "lawyer_forward",
+        "animation": [
+          "lawyer_paper_00",
+          "lawyer_paper_01",
+          "lawyer_paper_02"
+        ],
         "choices": [
           [
             "I haven't heard about any trouble.",
@@ -51,7 +61,7 @@
       {
         "id": "LIAR",
         "text": "You liar! There ain't no Mr. Bowler. I made him up!",
-        "image": "lawyer_pointing",
+        "animation": ["lawyer_pointing_00", "lawyer_pointing_01", "lawyer_pointing_02"],
         "choices": [
           [
             "...",
@@ -62,7 +72,11 @@
       {
         "id": "DONT_WORRY",
         "text": "Don't you worry about it. Say, do you have something to eat? I'm starving.",
-        "image": "lawyer_neutral",
+        "animation": [
+          "lawyer_triumph_00",
+          "lawyer_triumph_01",
+          "lawyer_triumph_02"
+        ],
         "choices": [
           [
             "...",
@@ -73,7 +87,11 @@
       {
         "id": "GAME_OVER",
         "text": "[GAME OVER]",
-        "image": "lawyer_pointing",
+        "animation": [
+          "lawyer_embarrassed_00",
+          "lawyer_embarrassed_01",
+          "lawyer_embarrassed_02"
+        ],
         "choices": [
           [
             "Start over.",
@@ -84,7 +102,11 @@
       {
         "id": "VICTORY",
         "text": "[YOU WON]",
-        "image": "lawyer_neutral",
+        "animation": [
+          "lawyer_triumph_00",
+          "lawyer_triumph_01",
+          "lawyer_triumph_02"
+        ],
         "choices": [
           [
             "Play again.",

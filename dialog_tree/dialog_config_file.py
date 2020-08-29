@@ -26,14 +26,14 @@ def _parse_sequence_json(sequence_json) -> DialogGraph:
     root_id = "START"
     initial_step = sequence_json[0]
     next_text = "Next"
-    nodes = [DialogNode(root_id, initial_step[0], initial_step[1], [DialogChoice(next_text, "1")])]
+    nodes = [DialogNode(root_id, initial_step[0], [initial_step[1]], [DialogChoice(next_text, "1")])]
     for i in range(1, len(sequence_json) - 1):
         step = sequence_json[i]
-        nodes.append(DialogNode(str(i), step[0], step[1], [DialogChoice(next_text, str(i + 1))]))
+        nodes.append(DialogNode(str(i), step[0], [step[1]], [DialogChoice(next_text, str(i + 1))]))
     last_step = sequence_json[-1]
     nodes.append(
-                DialogNode(str(len(sequence_json) - 1), last_step[0], last_step[1],
-                           [DialogChoice("Play from beginning", root_id)]))
+        DialogNode(str(len(sequence_json) - 1), last_step[0], [last_step[1]],
+                   [DialogChoice("Play from beginning", root_id)]))
     return DialogGraph(root_id, nodes)
 
 
@@ -42,10 +42,14 @@ def _parse_graph_json(graph_json) -> DialogGraph:
         return DialogChoice(array[0], array[1])
 
     def parse_node(node) -> DialogNode:
+        if "image" in node:
+            animation_image_ids = [node["image"]]
+        else:
+            animation_image_ids = node["animation"]
         return DialogNode(
-                    node["id"],
-                    node["text"],
-                    node["image"],
-                    [parse_choice(choice) for choice in node["choices"]])
+            node_id=node["id"],
+            text=node["text"],
+            animation_image_ids=animation_image_ids,
+            choices=[parse_choice(choice) for choice in node["choices"]])
 
     return DialogGraph(graph_json["root"], [parse_node(node) for node in graph_json["nodes"]])

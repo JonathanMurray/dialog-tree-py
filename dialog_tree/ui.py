@@ -1,12 +1,12 @@
 from abc import ABC
-from typing import Iterator, Tuple, Callable, List
+from typing import Iterator, Tuple, Callable, List, Any
 
 import pygame
 from pygame.font import Font
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from constants import WHITE, GREEN, BLACK, Vec2, Vec3
+from constants import WHITE, GREEN, BLACK, Vec2, Vec3, Millis
 
 
 class Component(ABC):
@@ -23,9 +23,54 @@ class ComponentCollection:
             screen.blit(component.surface, position)
 
 
-class Portrait(Component):
+class PeriodicAction:
+    def __init__(self, cooldown: Millis, callback: Callable[[], Any]):
+        self._cooldown = cooldown
+        self._callback = callback
+        self._time_since_last_action = 0
+
+    def update(self, elapsed_time: Millis):
+        self._time_since_last_action += elapsed_time
+        if self._time_since_last_action >= self._cooldown:
+            self._time_since_last_action -= self._cooldown
+            self._callback()
+
+
+class Animation:
+    def __init__(self, frames: List[Surface]):
+        self._frames = frames
+        self._frame_index = 0
+
+    def change_frame(self):
+        self._frame_index = (self._frame_index + 1) % len(self._frames)
+
+    def image(self) -> Surface:
+        return self._frames[self._frame_index]
+
+
+class StaticImage(Component):
     def __init__(self, image: Surface):
         super().__init__(image)
+
+
+class AnimatedImage(Component):
+
+    def __init__(self, animation: Animation):
+        super().__init__(Surface(animation.image().get_size()))
+        self._animation = animation
+        self._redraw()
+        self._periodic_frame_change = PeriodicAction(Millis(100), self._change_frame)
+
+    def _redraw(self):
+        self.surface.fill(BLACK)
+        self.surface.blit(self._animation.image(), (0, 0))
+
+    def _change_frame(self):
+        self._animation.change_frame()
+        self._redraw()
+
+    def update(self, elapsed_time: Millis):
+        self._periodic_frame_change.update(elapsed_time)
 
 
 class Button(Component):
@@ -69,17 +114,17 @@ class TextBox(Component):
         self._lines = self._split_into_lines(text)
         self._cursor = 0
         self._max_cursor_position = len(text) - 1
+        self._periodic_cursor_advance = PeriodicAction(Millis(40), self._advance_cursor)
 
         self._redraw()
 
-    def advance_cursor(self) -> bool:
-        """Advance the cursor one step, and return True if this made it reach the end"""
-        if self._cursor == self._max_cursor_position:
-            return False
+    def _advance_cursor(self):
+        if self._cursor < self._max_cursor_position:
+            self._cursor += 1
+            self._redraw()
 
-        self._cursor = min(self._cursor + 1, self._max_cursor_position)
-        self._redraw()
-        return self._cursor == self._max_cursor_position
+    def update(self, elapsed_time: Millis):
+        self._periodic_cursor_advance.update(elapsed_time)
 
     def is_cursor_at_end(self) -> bool:
         return self._cursor == self._max_cursor_position

@@ -5,10 +5,10 @@ import pygame
 from pygame.font import Font
 from pygame.surface import Surface
 
-from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR
+from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis
 from dialog_config_file import load_dialog_from_file
 from dialog_graph import DialogGraph
-from ui import TextBox, Button, ComponentCollection, Portrait
+from ui import TextBox, Button, ComponentCollection, AnimatedImage, Animation
 
 PORTRAIT_IMAGE_SIZE = (480, 240)
 
@@ -22,18 +22,23 @@ class Game:
         self._images = images
         self._dialog_graph = dialog_graph
 
-        text, self._active_image_id, self._choice_texts = self._dialog_graph.get_current_state()
+        self._clock = pygame.time.Clock()
 
-        self._setup_ui_with_dialog(text)
+        self._current_dialog_node = self._dialog_graph.current_node()
 
-    def _setup_ui_with_dialog(self, dialog_text: str):
+        self._setup_ui_with_dialog()
+
+    def _setup_ui_with_dialog(self):
         margin = 10
         inner_width = self._screen.get_width() - margin * 2
-        self._dialog_box = TextBox(self._dialog_font, (inner_width, 120), dialog_text,
+        self._dialog_box = TextBox(self._dialog_font, (inner_width, 120), self._current_dialog_node.text,
                                    border_color=(150, 150, 150), text_color=(255, 255, 255))
 
+        animation = Animation([self._images[i] for i in self._current_dialog_node.animation_image_ids])
+
+        self._image = AnimatedImage(animation)
         components = [
-            (Portrait(self._images[self._active_image_id]), (margin, margin)),
+            (self._image, (margin, margin)),
             (self._dialog_box, (margin, PORTRAIT_IMAGE_SIZE[1] + margin * 2)),
         ]
         self._ui = ComponentCollection(components)
@@ -44,8 +49,8 @@ class Game:
         inner_width = self._screen.get_width() - margin * 2
 
         button_height = 40
-        self._choice_buttons = [Button(self._choice_font, (inner_width, button_height), choice_text)
-                                for choice_text in self._choice_texts]
+        self._choice_buttons = [Button(self._choice_font, (inner_width, button_height), choice.text)
+                                for choice in self._current_dialog_node.choices]
         self._active_choice_index = 0
         if self._choice_buttons:
             self._choice_buttons[self._active_choice_index].set_highlighted(True)
@@ -60,14 +65,20 @@ class Game:
             self._render()
 
     def _handle_events(self):
+
+        elapsed_time = Millis(self._clock.tick())
+
+        self._image.update(elapsed_time)
+        self._dialog_box.update(elapsed_time)
+
+        if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
+            self._add_buttons_to_ui()
+
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 _exit_game()
-            if event.type == EVENT_INTERVAL:
-                reached_end = self._dialog_box.advance_cursor()
-                if reached_end:
-                    self._add_buttons_to_ui()
+
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
                     self._change_active_choice(1)
@@ -85,8 +96,8 @@ class Game:
     def _make_choice(self):
         if self._choice_buttons:
             self._dialog_graph.make_choice(self._active_choice_index)
-            dialog_text, self._active_image_id, self._choice_texts = self._dialog_graph.get_current_state()
-            self._setup_ui_with_dialog(dialog_text)
+            self._current_dialog_node = self._dialog_graph.current_node()
+            self._setup_ui_with_dialog()
 
     def _render(self):
         self._screen.fill(BLACK)
@@ -103,7 +114,7 @@ def start(dialog_filename: Optional[str] = None):
     pygame.time.set_timer(EVENT_INTERVAL, 40)
 
     image_paths = os.listdir(IMG_DIR)
-    images = {path.split(".")[0]: load_image(path) for path in image_paths}
+    images: Dict[str, Surface] = {path.split(".")[0]: load_image(path) for path in image_paths}
 
     dialog_filename = dialog_filename or "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
