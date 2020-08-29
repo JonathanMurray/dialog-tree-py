@@ -38,6 +38,8 @@ class PeriodicAction:
 
 class Animation:
     def __init__(self, frames: List[Surface]):
+        if not frames:
+            raise ValueError("Cannot instantiate animation without frames!")
         self._frames = frames
         self._frame_index = 0
 
@@ -59,7 +61,7 @@ class AnimatedImage(Component):
         super().__init__(Surface(animation.image().get_size()))
         self._animation = animation
         self._redraw()
-        self._periodic_frame_change = PeriodicAction(Millis(100), self._change_frame)
+        self._periodic_frame_change = PeriodicAction(Millis(130), self._change_frame)
 
     def _redraw(self):
         self.surface.fill(BLACK)

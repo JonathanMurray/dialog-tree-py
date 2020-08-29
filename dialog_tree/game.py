@@ -1,5 +1,6 @@
 import os
-from typing import Dict, Optional
+from pathlib import Path
+from typing import Dict, Optional, List, Tuple
 
 import pygame
 from pygame.font import Font
@@ -15,11 +16,12 @@ PORTRAIT_IMAGE_SIZE = (480, 240)
 
 class Game:
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        dialog_graph: DialogGraph):
+        animations: Dict[str, List[Surface]], dialog_graph: DialogGraph):
         self._screen = screen
         self._dialog_font = dialog_font
         self._choice_font = choice_font
         self._images = images
+        self._animations = animations
         self._dialog_graph = dialog_graph
 
         self._clock = pygame.time.Clock()
@@ -34,8 +36,11 @@ class Game:
         self._dialog_box = TextBox(self._dialog_font, (inner_width, 120), self._current_dialog_node.text,
                                    border_color=(150, 150, 150), text_color=(255, 255, 255))
 
-        animation = Animation([self._images[i] for i in self._current_dialog_node.animation_image_ids])
-
+        animation_ref = self._current_dialog_node.animation_ref
+        if animation_ref.image_ids:
+            animation = Animation([self._images[i] for i in animation_ref.image_ids])
+        else:
+            animation = Animation(self._animations[animation_ref.directory])
         self._image = AnimatedImage(animation)
         components = [
             (self._image, (margin, margin)),
@@ -113,22 +118,40 @@ def start(dialog_filename: Optional[str] = None):
     pygame.display.init()
     pygame.time.set_timer(EVENT_INTERVAL, 40)
 
-    image_paths = os.listdir(IMG_DIR)
-    images: Dict[str, Surface] = {path.split(".")[0]: load_image(path) for path in image_paths}
-
+    images, animations = load_images()
     dialog_filename = dialog_filename or "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
 
     screen_size = 500, 500
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption(dialog_graph.title or dialog_filename)
-    game = Game(screen, dialog_font, choice_font, images, dialog_graph)
+    game = Game(screen, dialog_font, choice_font, images, animations, dialog_graph)
     game.run()
 
 
-def load_image(filename: str):
-    print(f"Loading image: {filename}")
-    return pygame.transform.scale(pygame.image.load(f"{IMG_DIR}/{filename}"), PORTRAIT_IMAGE_SIZE)
+def load_images() -> Tuple[Dict[str, Surface], Dict[str, List[Surface]]]:
+    images: Dict[str, Surface] = {}
+    animations: Dict[str, List[Surface]] = {}
+    for filename in os.listdir(IMG_DIR):
+        filepath = Path(IMG_DIR).joinpath(filename)
+        if filepath.is_dir():
+            frame_filenames = os.listdir(filepath)
+            frame_filenames.sort()
+            animations[filename] = [load_and_scale(filepath.joinpath(frame_filename))
+                                    for frame_filename in frame_filenames]
+        else:
+            images[str(filename).split(".")[0]] = load_and_scale(filepath)
+    print(f"Loaded {len(images) + sum((len(d) for d in animations.values()))} image files.")
+    return images, animations
+
+
+def load_and_scale(filepath: Path) -> Surface:
+    try:
+        print(f"Loading image: {filepath}")
+        surface = pygame.image.load(str(filepath))
+        return pygame.transform.scale(surface, PORTRAIT_IMAGE_SIZE)
+    except pygame.error as e:
+        raise Exception(f"Failed to load image '{filepath}': {e}")
 
 
 def _exit_game():

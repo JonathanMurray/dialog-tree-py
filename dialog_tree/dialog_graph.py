@@ -7,13 +7,28 @@ class DialogChoice:
         self.leads_to_id = leads_to_id
 
 
+class AnimationRef:
+
+    def __init__(self, directory: Optional[str] = None, image_ids: Optional[List[str]] = None):
+        self.directory = directory
+        self.image_ids = image_ids
+
+    @staticmethod
+    def of_directory(directory: str):
+        return AnimationRef(directory=directory)
+
+    @staticmethod
+    def of_image_ids(image_ids: List[str]):
+        return AnimationRef(image_ids=image_ids)
+
+
 class DialogNode:
-    def __init__(self, node_id: str, text: str, animation_image_ids: List[str], choices: List[DialogChoice]):
+    def __init__(self, node_id: str, text: str, animation_ref: AnimationRef, choices: List[DialogChoice]):
         if not node_id or not text:
             raise ValueError("Invalid node config")
         self.node_id = node_id
         self.text = text
-        self.animation_image_ids = animation_image_ids
+        self.animation_ref = animation_ref
         self.choices = choices
 
 
