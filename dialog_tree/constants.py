@@ -4,6 +4,7 @@ import pygame
 
 FONT_DIR = "resources/fonts"
 IMG_DIR = "resources/images"
+SOUND_DIR = "resources/sounds"
 DIALOG_DIR = "resources/dialog"
 
 BLACK = 0, 0, 0

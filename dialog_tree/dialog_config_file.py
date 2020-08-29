@@ -59,6 +59,7 @@ def _parse_graph_json(graph_json) -> Dialog:
             node_id=node["id"],
             text=node["text"],
             animation_ref=animation_ref,
-            choices=[parse_choice(choice) for choice in node["choices"]])
+            choices=[parse_choice(choice) for choice in node["choices"]],
+            sound_id=node.get("sound", None))
 
     return Dialog(graph_json["root"], [parse_node(node) for node in graph_json["nodes"]])

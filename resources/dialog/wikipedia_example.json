@@ -1,7 +1,10 @@
 {
   "title": "en.wikipedia.org/wiki/Dialogue_tree",
   "background_image_id": "lawyer_background",
-  "foreground_offset": [0, 40],
+  "foreground_offset": [
+    0,
+    40
+  ],
   "graph": {
     "root": "START",
     "nodes": [
@@ -53,6 +56,7 @@
       {
         "id": "LIAR",
         "text": "You liar! There ain't no Mr. Bowler. I made him up!",
+        "sound": "hold_it",
         "animation_dir": "lawyer_forward",
         "choices": [
           [
@@ -75,6 +79,7 @@
       {
         "id": "GAME_OVER",
         "text": "[GAME OVER]",
+        "sound": "take_that",
         "animation_dir": "lawyer_pointing",
         "choices": [
           [
@@ -86,6 +91,7 @@
       {
         "id": "VICTORY",
         "text": "[YOU WON]",
+        "sound": "applause",
         "animation_dir": "lawyer_triumph",
         "choices": [
           [

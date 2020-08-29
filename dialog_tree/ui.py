@@ -3,6 +3,7 @@ from typing import Iterator, Tuple, Callable, List, Any, Optional
 
 import pygame
 from pygame.font import Font
+from pygame.mixer import Sound
 from pygame.rect import Rect
 from pygame.surface import Surface
 
@@ -103,7 +104,7 @@ class ChoiceButton(Component):
 
 
 class TextBox(Component):
-    def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3):
+    def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3, blip_sound: Sound):
         super().__init__(Surface(size))
 
         self._container_rect = Rect((0, 0), size)
@@ -112,6 +113,7 @@ class TextBox(Component):
         self._font = font
         self._border_color = border_color
         self._text_color = text_color
+        self._blip_sound = blip_sound
         self._lines = self._split_into_lines(text)
         self._cursor = 0
         self._max_cursor_position = len(text) - 1
@@ -121,6 +123,7 @@ class TextBox(Component):
 
     def _advance_cursor(self):
         if self._cursor < self._max_cursor_position:
+            self._blip_sound.play()
             self._cursor += 1
             self._redraw()
 
