@@ -1,12 +1,14 @@
 {
   "title": "en.wikipedia.org/wiki/Dialogue_tree",
+  "background_image_id": "lawyer_background",
+  "foreground_offset": [0, 40],
   "graph": {
     "root": "START",
     "nodes": [
       {
         "id": "START",
         "text": "You don't look like you're from around here.",
-        "image": "lawyer_neutral",
+        "animation_dir": "lawyer_paper",
         "choices": [
           [
             "I've lived here all my life!",
@@ -21,7 +23,7 @@
       {
         "id": "MR_BOWLER_QUESTION",
         "text": "Oh really? Then you must know Mr. Bowler.",
-        "image": "lawyer_forward",
+        "animation_dir": "lawyer_thinking",
         "choices": [
           [
             "Mr. Bowler is a good friend of mine!",
@@ -36,7 +38,7 @@
       {
         "id": "NEWTON_TROUBLE_QUESTION",
         "text": "Newton, eh? I heard there's trouble brewing down there.",
-        "image": "lawyer_forward",
+        "animation_dir": "lawyer_forward",
         "choices": [
           [
             "I haven't heard about any trouble.",
@@ -51,7 +53,7 @@
       {
         "id": "LIAR",
         "text": "You liar! There ain't no Mr. Bowler. I made him up!",
-        "image": "lawyer_pointing",
+        "animation_dir": "lawyer_forward",
         "choices": [
           [
             "...",
@@ -62,7 +64,7 @@
       {
         "id": "DONT_WORRY",
         "text": "Don't you worry about it. Say, do you have something to eat? I'm starving.",
-        "image": "lawyer_neutral",
+        "animation_dir": "lawyer_embarrassed",
         "choices": [
           [
             "...",
@@ -73,7 +75,7 @@
       {
         "id": "GAME_OVER",
         "text": "[GAME OVER]",
-        "image": "lawyer_pointing",
+        "animation_dir": "lawyer_pointing",
         "choices": [
           [
             "Start over.",
@@ -84,7 +86,7 @@
       {
         "id": "VICTORY",
         "text": "[YOU WON]",
-        "image": "lawyer_neutral",
+        "animation_dir": "lawyer_triumph",
         "choices": [
           [
             "Play again.",
