@@ -1,4 +1,5 @@
 from abc import ABC
+from random import randint
 from typing import Tuple, Callable, List, Any, Optional, Dict
 
 import pygame
@@ -22,6 +23,23 @@ class Component(ABC):
         pass
 
 
+class ScreenShake:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self._remaining = 0
+
+    def start(self, duration: Millis):
+        self._remaining = duration
+
+    def update(self, elapsed_time: Millis):
+        self._remaining = max(0, self._remaining - elapsed_time)
+        if self._remaining == 0:
+            self.x, self.y = 0, 0
+        else:
+            self.x, self.y = randint(-10, 10), randint(-10, 10)
+
+
 class Ui:
     def __init__(self, surface: Surface, dialog_node: DialogNode, dialog_font: Font, choice_font: Font,
         images: Dict[str, Surface], animations: Dict[str, List[Surface]], text_blip_sound: Sound,
@@ -36,11 +54,13 @@ class Ui:
         self._select_blip_sound = select_blip_sound
         self._background_image_id = background_image_id
 
+        # MUTABLE STATE BELOW
         self._dialog_node = dialog_node
         self._components: List[Tuple[Component, Vec2]] = []
         self._dialog_box = None
         self._choice_buttons = []
         self._active_choice_index = 0
+        self._screen_shake = ScreenShake()
 
         self.set_dialog(dialog_node)
 
@@ -51,18 +71,19 @@ class Ui:
             border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
 
         background = self._images[self._background_image_id] if self._background_image_id else None
-        animation_ref = dialog_node.animation_ref
-        if animation_ref.image_ids:
-            animation = Animation([self._images[i] for i in animation_ref.image_ids],
-                                  animation_ref.offset)
+        graphics = dialog_node.graphics
+        if graphics.image_ids:
+            animation = Animation([self._images[i] for i in graphics.image_ids], graphics.offset)
         else:
-            animation = Animation(self._animations[animation_ref.directory], animation_ref.offset)
+            animation = Animation(self._animations[graphics.directory], graphics.offset)
         picture_component = Picture(background, animation)
         self._components = [
             (picture_component, (0, 0)),
             (self._dialog_box, (0, PICTURE_IMAGE_SIZE[1] + 10)),
         ]
         self._choice_buttons = []
+        if graphics.screen_shake:
+            self._screen_shake.start(graphics.screen_shake)
 
     def _add_choice_buttons(self):
         button_height = 40
@@ -78,10 +99,14 @@ class Ui:
 
     def redraw(self):
         self.surface.fill(BLACK)
-        for component, position in self._components:
-            self.surface.blit(component.surface, position)
+        dx, dy = (self._screen_shake.x, self._screen_shake.y)
+        for component, (x, y) in self._components:
+            self.surface.blit(component.surface, (x + dx, y + dy))
 
     def update(self, elapsed_time: Millis):
+
+        self._screen_shake.update(elapsed_time)
+
         for component, _ in self._components:
             component.update(elapsed_time)
 

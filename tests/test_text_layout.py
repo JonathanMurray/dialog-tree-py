@@ -1,5 +1,4 @@
 import text_util
-from dialog_tree import ui
 
 
 def test_simple():

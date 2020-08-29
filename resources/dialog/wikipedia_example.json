@@ -72,6 +72,7 @@
         "text": "",
         "sound": "hold_it",
         "graphics": {
+          "screen_shake": 300,
           "image": "hold_it"
         },
         "choices": [
@@ -120,6 +121,7 @@
         "text": "",
         "sound": "take_that",
         "graphics": {
+          "screen_shake": 300,
           "image": "take_that"
         },
         "choices": [
