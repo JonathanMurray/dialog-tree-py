@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 
 class DialogChoice:
@@ -32,11 +32,14 @@ class DialogNode:
         self.choices = choices
 
 
-class DialogGraph:
-    def __init__(self, root_id: str, nodes: List[DialogNode], title: Optional[str] = None):
+class Dialog:
+    def __init__(self, root_node_id: str, nodes: List[DialogNode], title: Optional[str] = None,
+        background_image_id: Optional[str] = None, foreground_offset: Tuple[int, int] = None):
         self.title = title
+        self.background_image_id = background_image_id
+        self.foreground_offset = foreground_offset or (0, 0)
         self._nodes_by_id: Dict[str, DialogNode] = {}
-        self._active_node_id = root_id
+        self._active_node_id = root_node_id
         for node in nodes:
             node_id = node.node_id
             if node_id in self._nodes_by_id:
@@ -49,8 +52,8 @@ class DialogGraph:
                     raise ValueError(
                         f"Dialog choice leading to missing node: {choice.leads_to_id}")
 
-        if root_id not in self._nodes_by_id:
-            raise ValueError(f"No node found with ID: {root_id}")
+        if root_node_id not in self._nodes_by_id:
+            raise ValueError(f"No node found with ID: {root_node_id}")
 
     def current_node(self) -> DialogNode:
         return self._nodes_by_id[self._active_node_id]

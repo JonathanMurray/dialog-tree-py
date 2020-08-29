@@ -1,5 +1,7 @@
 {
   "title": "en.wikipedia.org/wiki/Dialogue_tree",
+  "background_image_id": "lawyer_background",
+  "foreground_offset": [0, 40],
   "graph": {
     "root": "START",
     "nodes": [

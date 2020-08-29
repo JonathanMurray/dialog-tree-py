@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Iterator, Tuple, Callable, List, Any
+from typing import Iterator, Tuple, Callable, List, Any, Optional
 
 import pygame
 from pygame.font import Font
@@ -37,11 +37,12 @@ class PeriodicAction:
 
 
 class Animation:
-    def __init__(self, frames: List[Surface]):
+    def __init__(self, frames: List[Surface], offset: Tuple[int, int]):
         if not frames:
             raise ValueError("Cannot instantiate animation without frames!")
         self._frames = frames
         self._frame_index = 0
+        self.offset = offset
 
     def change_frame(self):
         self._frame_index = (self._frame_index + 1) % len(self._frames)
@@ -50,22 +51,20 @@ class Animation:
         return self._frames[self._frame_index]
 
 
-class StaticImage(Component):
-    def __init__(self, image: Surface):
-        super().__init__(image)
+class Picture(Component):
 
-
-class AnimatedImage(Component):
-
-    def __init__(self, animation: Animation):
+    def __init__(self, background: Optional[Surface], animation: Animation):
         super().__init__(Surface(animation.image().get_size()))
+        self._background = background
         self._animation = animation
         self._redraw()
         self._periodic_frame_change = PeriodicAction(Millis(130), self._change_frame)
 
     def _redraw(self):
         self.surface.fill(BLACK)
-        self.surface.blit(self._animation.image(), (0, 0))
+        if self._background:
+            self.surface.blit(self._background, (0, 0))
+        self.surface.blit(self._animation.image(), self._animation.offset)
 
     def _change_frame(self):
         self._animation.change_frame()
@@ -75,7 +74,7 @@ class AnimatedImage(Component):
         self._periodic_frame_change.update(elapsed_time)
 
 
-class Button(Component):
+class ChoiceButton(Component):
     def __init__(self, font: Font, size: Vec2, text: str, highlighted: bool = False):
         super().__init__(Surface(size))
 

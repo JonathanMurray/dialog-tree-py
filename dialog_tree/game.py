@@ -8,15 +8,15 @@ from pygame.surface import Surface
 
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis
 from dialog_config_file import load_dialog_from_file
-from dialog_graph import DialogGraph
-from ui import TextBox, Button, ComponentCollection, AnimatedImage, Animation
+from dialog_graph import Dialog
+from ui import TextBox, ChoiceButton, ComponentCollection, Picture, Animation
 
-PORTRAIT_IMAGE_SIZE = (480, 240)
+PICTURE_IMAGE_SIZE = (480, 240)
 
 
 class Game:
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], dialog_graph: DialogGraph):
+        animations: Dict[str, List[Surface]], dialog_graph: Dialog):
         self._screen = screen
         self._dialog_font = dialog_font
         self._choice_font = choice_font
@@ -36,15 +36,18 @@ class Game:
         self._dialog_box = TextBox(self._dialog_font, (inner_width, 120), self._current_dialog_node.text,
                                    border_color=(150, 150, 150), text_color=(255, 255, 255))
 
+        background_id = self._dialog_graph.background_image_id
+        background = self._images[background_id] if background_id else None
         animation_ref = self._current_dialog_node.animation_ref
         if animation_ref.image_ids:
-            animation = Animation([self._images[i] for i in animation_ref.image_ids])
+            animation = Animation([self._images[i] for i in animation_ref.image_ids],
+                                  self._dialog_graph.foreground_offset)
         else:
-            animation = Animation(self._animations[animation_ref.directory])
-        self._image = AnimatedImage(animation)
+            animation = Animation(self._animations[animation_ref.directory], self._dialog_graph.foreground_offset)
+        self._picture_component = Picture(background, animation)
         components = [
-            (self._image, (margin, margin)),
-            (self._dialog_box, (margin, PORTRAIT_IMAGE_SIZE[1] + margin * 2)),
+            (self._picture_component, (margin, margin)),
+            (self._dialog_box, (margin, PICTURE_IMAGE_SIZE[1] + margin * 2)),
         ]
         self._ui = ComponentCollection(components)
         self._choice_buttons = []
@@ -54,7 +57,7 @@ class Game:
         inner_width = self._screen.get_width() - margin * 2
 
         button_height = 40
-        self._choice_buttons = [Button(self._choice_font, (inner_width, button_height), choice.text)
+        self._choice_buttons = [ChoiceButton(self._choice_font, (inner_width, button_height), choice.text)
                                 for choice in self._current_dialog_node.choices]
         self._active_choice_index = 0
         if self._choice_buttons:
@@ -73,7 +76,7 @@ class Game:
 
         elapsed_time = Millis(self._clock.tick())
 
-        self._image.update(elapsed_time)
+        self._picture_component.update(elapsed_time)
         self._dialog_box.update(elapsed_time)
 
         if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
@@ -147,9 +150,9 @@ def load_images() -> Tuple[Dict[str, Surface], Dict[str, List[Surface]]]:
 
 def load_and_scale(filepath: Path) -> Surface:
     try:
-        print(f"Loading image: {filepath}")
+        # print(f"Loading image: {filepath}")
         surface = pygame.image.load(str(filepath))
-        return pygame.transform.scale(surface, PORTRAIT_IMAGE_SIZE)
+        return pygame.transform.scale(surface, PICTURE_IMAGE_SIZE)
     except pygame.error as e:
         raise Exception(f"Failed to load image '{filepath}': {e}")
 
