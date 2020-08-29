@@ -8,7 +8,7 @@
       {
         "id": "START",
         "text": "You don't look like you're from around here.",
-        "animation_dir": "lawyer_thinking",
+        "animation_dir": "lawyer_paper",
         "choices": [
           [
             "I've lived here all my life!",
@@ -23,7 +23,7 @@
       {
         "id": "MR_BOWLER_QUESTION",
         "text": "Oh really? Then you must know Mr. Bowler.",
-        "animation_dir": "lawyer_forward",
+        "animation_dir": "lawyer_thinking",
         "choices": [
           [
             "Mr. Bowler is a good friend of mine!",
@@ -38,7 +38,7 @@
       {
         "id": "NEWTON_TROUBLE_QUESTION",
         "text": "Newton, eh? I heard there's trouble brewing down there.",
-        "animation_dir": "lawyer_paper",
+        "animation_dir": "lawyer_forward",
         "choices": [
           [
             "I haven't heard about any trouble.",
@@ -53,7 +53,7 @@
       {
         "id": "LIAR",
         "text": "You liar! There ain't no Mr. Bowler. I made him up!",
-        "animation_dir": "lawyer_pointing",
+        "animation_dir": "lawyer_forward",
         "choices": [
           [
             "...",
@@ -64,7 +64,7 @@
       {
         "id": "DONT_WORRY",
         "text": "Don't you worry about it. Say, do you have something to eat? I'm starving.",
-        "animation_dir": "lawyer_triumph",
+        "animation_dir": "lawyer_embarrassed",
         "choices": [
           [
             "...",
@@ -75,7 +75,7 @@
       {
         "id": "GAME_OVER",
         "text": "[GAME OVER]",
-        "animation_dir": "lawyer_embarrassed",
+        "animation_dir": "lawyer_pointing",
         "choices": [
           [
             "Start over.",
