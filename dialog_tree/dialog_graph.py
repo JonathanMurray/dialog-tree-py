@@ -1,4 +1,6 @@
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict
+
+from constants import Vec2
 
 
 class DialogChoice:
@@ -10,17 +12,17 @@ class DialogChoice:
 class AnimationRef:
 
     def __init__(self, directory: Optional[str] = None, image_ids: Optional[List[str]] = None,
-        offset: Optional[Tuple[int, int]] = None):
+        offset: Optional[Vec2] = None):
         self.directory = directory
         self.image_ids = image_ids
-        self.offset: Tuple[int, int] = offset or (0, 0)
+        self.offset: Vec2 = offset or (0, 0)
 
     @staticmethod
-    def of_directory(directory: str, offset: Optional[Tuple[int, int]] = None):
+    def of_directory(directory: str, offset: Optional[Vec2] = None):
         return AnimationRef(directory=directory, offset=offset)
 
     @staticmethod
-    def of_image_ids(image_ids: List[str], offset: Optional[Tuple[int, int]] = None):
+    def of_image_ids(image_ids: List[str], offset: Optional[Vec2] = None):
         return AnimationRef(image_ids=image_ids, offset=offset)
 
 
