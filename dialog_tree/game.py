@@ -10,115 +10,73 @@ from pygame.surface import Surface
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog_config_file import load_dialog_from_file
 from dialog_graph import Dialog
-from ui import TextBox, ChoiceButton, ComponentCollection, Picture, Animation
+from ui import Ui, PICTURE_IMAGE_SIZE
 
-PICTURE_IMAGE_SIZE = (480, 240)
+UI_MARGIN = 10
 
 
 class Game:
+
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sounds: Dict[str, Sound], dialog_graph: Dialog):
         self._screen = screen
-        self._dialog_font = dialog_font
-        self._choice_font = choice_font
-        self._images = images
-        self._animations = animations
         self._sounds = sounds
-        self._select_blip_sound = self._sounds["select_blip"]
-        self._text_blip_sound = self._sounds["text_blip"]
         self._dialog_graph = dialog_graph
 
         self._clock = pygame.time.Clock()
 
         self._current_dialog_node = self._dialog_graph.current_node()
 
-        self._setup_ui_with_dialog()
-
-    def _setup_ui_with_dialog(self):
-        margin = 10
-        inner_width = self._screen.get_width() - margin * 2
-        self._dialog_box = TextBox(
-            self._dialog_font, (inner_width, 120), self._current_dialog_node.text,
-            border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
-
-        background_id = self._dialog_graph.background_image_id
-        background = self._images[background_id] if background_id else None
-        animation_ref = self._current_dialog_node.animation_ref
-        if animation_ref.image_ids:
-            animation = Animation([self._images[i] for i in animation_ref.image_ids],
-                                  animation_ref.offset)
-        else:
-            animation = Animation(self._animations[animation_ref.directory], animation_ref.offset)
-        self._picture_component = Picture(background, animation)
-        components = [
-            (self._picture_component, (margin, margin)),
-            (self._dialog_box, (margin, PICTURE_IMAGE_SIZE[1] + margin * 2)),
-        ]
-        self._ui = ComponentCollection(components)
-        self._choice_buttons = []
-
-    def _add_buttons_to_ui(self):
-        margin = 10
-        inner_width = self._screen.get_width() - margin * 2
-
-        button_height = 40
-        self._choice_buttons = [ChoiceButton(self._choice_font, (inner_width, button_height), choice.text)
-                                for choice in self._current_dialog_node.choices]
-        self._active_choice_index = 0
-        if self._choice_buttons:
-            self._choice_buttons[self._active_choice_index].set_highlighted(True)
-        for i, button in enumerate(self._choice_buttons):
-            j = len(self._choice_buttons) - i
-            position = (margin, self._screen.get_height() - button_height * j - margin * j)
-            self._ui.components.append((button, position))
+        ui_size = (screen.get_width() - UI_MARGIN * 2, screen.get_height() - UI_MARGIN * 2)
+        self._ui = Ui(
+            surface=Surface(ui_size),
+            dialog_node=self._current_dialog_node,
+            dialog_font=dialog_font,
+            choice_font=choice_font,
+            images=images,
+            animations=animations,
+            text_blip_sound=sounds["text_blip"],
+            select_blip_sound=sounds["select_blip"],
+            background_image_id=self._dialog_graph.background_image_id,
+        )
 
     def run(self):
         while True:
-            self._handle_events()
+            self._update()
             self._render()
 
-    def _handle_events(self):
+    def _update(self):
 
         elapsed_time = Millis(self._clock.tick())
 
-        self._picture_component.update(elapsed_time)
-        self._dialog_box.update(elapsed_time)
+        self._ui.update(elapsed_time)
 
-        if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
-            self._add_buttons_to_ui()
-
-        events = pygame.event.get()
-        for event in events:
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 _exit_game()
 
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
-                    self._change_active_choice(1)
+                    self._ui.try_change_active_choice(1)
                 if event.key in [pygame.K_UP, pygame.K_LEFT]:
-                    self._change_active_choice(-1)
+                    self._ui.try_change_active_choice(-1)
                 if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
                     self._make_choice()
 
-    def _change_active_choice(self, delta: int):
-        if self._choice_buttons and len(self._choice_buttons) > 1:
-            self._select_blip_sound.play()
-            self._choice_buttons[self._active_choice_index].set_highlighted(False)
-            self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
-            self._choice_buttons[self._active_choice_index].set_highlighted(True)
-
     def _make_choice(self):
-        if self._choice_buttons:
-            self._dialog_graph.make_choice(self._active_choice_index)
+        chosen_index = self._ui.try_make_choice()
+        if chosen_index is not None:
+            self._dialog_graph.make_choice(chosen_index)
             self._current_dialog_node = self._dialog_graph.current_node()
             if self._current_dialog_node.sound_id:
                 # TODO stop any currently playing sound effect when going to new screen
                 self._sounds[self._current_dialog_node.sound_id].play()
-            self._setup_ui_with_dialog()
+            self._ui.set_dialog(self._current_dialog_node)
 
     def _render(self):
         self._screen.fill(BLACK)
-        self._ui.render(self._screen)
+        self._ui.redraw()
+        self._screen.blit(self._ui.surface, (UI_MARGIN, UI_MARGIN))
         pygame.display.update()
 
 

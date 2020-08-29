@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Tuple, Callable, List, Any, Optional
+from typing import Tuple, Callable, List, Any, Optional, Dict
 
 import pygame
 from pygame.font import Font
@@ -8,21 +8,96 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 
 from constants import WHITE, GREEN, BLACK, Vec2, Vec3, Millis
+from dialog_graph import DialogNode
 from text_util import layout_text_in_area
+
+PICTURE_IMAGE_SIZE = (480, 240)
 
 
 class Component(ABC):
     def __init__(self, surface: Surface):
         self.surface = surface
 
+    def update(self, elapsed_time: Millis):
+        pass
 
-class ComponentCollection:
-    def __init__(self, components: List[Tuple[Component, Vec2]]):
-        self.components = components
 
-    def render(self, screen: Surface):
-        for component, position in self.components:
-            screen.blit(component.surface, position)
+class Ui:
+    def __init__(self, surface: Surface, dialog_node: DialogNode, dialog_font: Font, choice_font: Font,
+        images: Dict[str, Surface], animations: Dict[str, List[Surface]], text_blip_sound: Sound,
+        select_blip_sound: Sound, background_image_id: str):
+        self.surface = surface
+        self._width = surface.get_width()
+        self._dialog_font = dialog_font
+        self._choice_font = choice_font
+        self._images = images
+        self._animations = animations
+        self._text_blip_sound = text_blip_sound
+        self._select_blip_sound = select_blip_sound
+        self._background_image_id = background_image_id
+
+        self._dialog_node = dialog_node
+        self._components: List[Tuple[Component, Vec2]] = []
+        self._dialog_box = None
+        self._choice_buttons = []
+        self._active_choice_index = 0
+
+        self.set_dialog(dialog_node)
+
+    def set_dialog(self, dialog_node: DialogNode):
+        self._dialog_node = dialog_node
+        self._dialog_box = TextBox(
+            self._dialog_font, (self._width, 120), dialog_node.text,
+            border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
+
+        background = self._images[self._background_image_id] if self._background_image_id else None
+        animation_ref = dialog_node.animation_ref
+        if animation_ref.image_ids:
+            animation = Animation([self._images[i] for i in animation_ref.image_ids],
+                                  animation_ref.offset)
+        else:
+            animation = Animation(self._animations[animation_ref.directory], animation_ref.offset)
+        picture_component = Picture(background, animation)
+        self._components = [
+            (picture_component, (0, 0)),
+            (self._dialog_box, (0, PICTURE_IMAGE_SIZE[1] + 10)),
+        ]
+        self._choice_buttons = []
+
+    def _add_choice_buttons(self):
+        button_height = 40
+        self._choice_buttons = [ChoiceButton(self._choice_font, (self._width, button_height), choice.text)
+                                for choice in self._dialog_node.choices]
+        self._active_choice_index = 0
+        if self._choice_buttons:
+            self._choice_buttons[self._active_choice_index].set_highlighted(True)
+        for i, button in enumerate(self._choice_buttons):
+            j = len(self._choice_buttons) - i
+            position = (0, self.surface.get_height() - button_height * j - 10 * j)
+            self._components.append((button, position))
+
+    def redraw(self):
+        self.surface.fill(BLACK)
+        for component, position in self._components:
+            self.surface.blit(component.surface, position)
+
+    def update(self, elapsed_time: Millis):
+        for component, _ in self._components:
+            component.update(elapsed_time)
+
+        if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
+            self._add_choice_buttons()
+
+    def try_change_active_choice(self, delta: int):
+        if self._choice_buttons and len(self._choice_buttons) > 1:
+            self._select_blip_sound.play()
+            self._choice_buttons[self._active_choice_index].set_highlighted(False)
+            self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
+            self._choice_buttons[self._active_choice_index].set_highlighted(True)
+
+    def try_make_choice(self) -> Optional[int]:
+        if self._choice_buttons:
+            return self._active_choice_index
 
 
 class PeriodicAction:
@@ -39,7 +114,7 @@ class PeriodicAction:
 
 
 class Animation:
-    def __init__(self, frames: List[Surface], offset: Tuple[int, int]):
+    def __init__(self, frames: List[Surface], offset: Vec2):
         if not frames:
             raise ValueError("Cannot instantiate animation without frames!")
         self._frames = frames
@@ -151,5 +226,3 @@ class TextBox(Component):
             self.surface.blit(rendered_line, (x, y))
             y += rendered_line.get_height()
             num_chars_rendered += len(part_of_line)
-
-
