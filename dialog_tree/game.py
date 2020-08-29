@@ -10,9 +10,11 @@ from pygame.surface import Surface
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog_config_file import load_dialog_from_file
 from dialog_graph import Dialog
-from ui import Ui, PICTURE_IMAGE_SIZE
+from ui import Ui
 
-UI_MARGIN = 10
+UI_MARGIN = 3
+SCREEN_SIZE = 500, 500
+PICTURE_SIZE = (SCREEN_SIZE[0] - UI_MARGIN * 2, 380)
 
 
 class Game:
@@ -28,8 +30,11 @@ class Game:
         self._current_dialog_node = self._dialog_graph.current_node()
 
         ui_size = (screen.get_width() - UI_MARGIN * 2, screen.get_height() - UI_MARGIN * 2)
+        background_id = self._dialog_graph.background_image_id
+        background = images[background_id] if background_id else None
         self._ui = Ui(
             surface=Surface(ui_size),
+            picture_size=PICTURE_SIZE,
             dialog_node=self._current_dialog_node,
             dialog_font=dialog_font,
             choice_font=choice_font,
@@ -37,7 +42,7 @@ class Game:
             animations=animations,
             text_blip_sound=sounds["text_blip"],
             select_blip_sound=sounds["select_blip"],
-            background_image_id=self._dialog_graph.background_image_id,
+            background=background,
         )
 
     def run(self):
@@ -93,8 +98,7 @@ def start(dialog_filename: Optional[str] = None):
     dialog_filename = dialog_filename or "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
 
-    screen_size = 500, 500
-    screen = pygame.display.set_mode(screen_size)
+    screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption(dialog_graph.title or dialog_filename)
     game = Game(screen, dialog_font, choice_font, images, animations, sounds, dialog_graph)
     game.run()
@@ -137,7 +141,7 @@ def load_and_scale(filepath: Path) -> Surface:
     try:
         # print(f"Loading image: {filepath}")
         surface = pygame.image.load(str(filepath))
-        return pygame.transform.scale(surface, PICTURE_IMAGE_SIZE)
+        return pygame.transform.scale(surface, PICTURE_SIZE)
     except pygame.error as e:
         raise Exception(f"Failed to load image '{filepath}': {e}")
 

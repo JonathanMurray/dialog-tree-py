@@ -12,8 +12,6 @@ from constants import WHITE, GREEN, BLACK, Vec2, Vec3, Millis
 from dialog_graph import DialogNode
 from text_util import layout_text_in_area
 
-PICTURE_IMAGE_SIZE = (480, 240)
-
 
 class Component(ABC):
     def __init__(self, surface: Surface):
@@ -41,10 +39,11 @@ class ScreenShake:
 
 
 class Ui:
-    def __init__(self, surface: Surface, dialog_node: DialogNode, dialog_font: Font, choice_font: Font,
-        images: Dict[str, Surface], animations: Dict[str, List[Surface]], text_blip_sound: Sound,
-        select_blip_sound: Sound, background_image_id: str):
+    def __init__(self, surface: Surface, picture_size: Vec2, dialog_node: DialogNode, dialog_font: Font,
+        choice_font: Font, images: Dict[str, Surface], animations: Dict[str, List[Surface]], text_blip_sound: Sound,
+        select_blip_sound: Sound, background: Optional[Surface]):
         self.surface = surface
+        self._picture_size = picture_size
         self._width = surface.get_width()
         self._dialog_font = dialog_font
         self._choice_font = choice_font
@@ -52,7 +51,7 @@ class Ui:
         self._animations = animations
         self._text_blip_sound = text_blip_sound
         self._select_blip_sound = select_blip_sound
-        self._background_image_id = background_image_id
+        self._background = background
 
         # MUTABLE STATE BELOW
         self._dialog_node = dialog_node
@@ -66,21 +65,21 @@ class Ui:
 
     def set_dialog(self, dialog_node: DialogNode):
         self._dialog_node = dialog_node
-        self._dialog_box = TextBox(
-            self._dialog_font, (self._width, 120), dialog_node.text,
-            border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
 
-        background = self._images[self._background_image_id] if self._background_image_id else None
         graphics = dialog_node.graphics
         if graphics.image_ids:
             animation = Animation([self._images[i] for i in graphics.image_ids], graphics.offset)
         else:
             animation = Animation(self._animations[graphics.directory], graphics.offset)
-        picture_component = Picture(background, animation)
-        self._components = [
-            (picture_component, (0, 0)),
-            (self._dialog_box, (0, PICTURE_IMAGE_SIZE[1] + 10)),
-        ]
+        margin = 5
+        dialog_box_size = (self._width - margin * 2, 120)
+        self._components = [(Picture(self._background, animation), (0, 0))]
+        if dialog_node.text:
+            self._dialog_box = TextBox(
+                self._dialog_font, dialog_box_size, dialog_node.text,
+                border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
+            self._components.append(
+                (self._dialog_box, (margin, self._picture_size[1] - dialog_box_size[1] - margin)))
         self._choice_buttons = []
         if graphics.screen_shake:
             self._screen_shake.start(graphics.screen_shake)
@@ -94,7 +93,7 @@ class Ui:
             self._choice_buttons[self._active_choice_index].set_highlighted(True)
         for i, button in enumerate(self._choice_buttons):
             j = len(self._choice_buttons) - i
-            position = (0, self.surface.get_height() - button_height * j - 10 * j)
+            position = (0, self.surface.get_height() - button_height * j - 5 * j)
             self._components.append((button, position))
 
     def redraw(self):
@@ -207,6 +206,7 @@ class ChoiceButton(Component):
 class TextBox(Component):
     def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3, blip_sound: Sound):
         super().__init__(Surface(size))
+        self.surface.set_alpha(180)
 
         self._container_rect = Rect((0, 0), size)
         pad = 30
