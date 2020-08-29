@@ -37,7 +37,9 @@ def test_load_graph():
                 {
                     "id": "1",
                     "text": "text 1",
-                    "image": "image 1",
+                    "graphics": {
+                        "image": "image 1"
+                    },
                     "choices": [
                         [
                             "stay here",
@@ -52,7 +54,9 @@ def test_load_graph():
                 {
                     "id": "2",
                     "text": "text 2",
-                    "image": "image 2",
+                    "graphics": {
+                        "image": "image 2"
+                    },
                     "choices": [
                         [
                             "go back",
@@ -82,7 +86,9 @@ def test_load_graph_with_animation():
                 {
                     "id": "1",
                     "text": "text 1",
-                    "animation": ["frame 1", "frame 2"],
+                    "graphics": {
+                        "animation": ["frame 1", "frame 2"],
+                    },
                     "choices": []
                 }
             ]
@@ -103,7 +109,9 @@ def test_load_graph_with_animation_dir():
                 {
                     "id": "1",
                     "text": "text 1",
-                    "animation_dir": "directory_with_images",
+                    "graphics": {
+                        "animation_dir": "directory_with_images",
+                    },
                     "choices": []
                 }
             ]
