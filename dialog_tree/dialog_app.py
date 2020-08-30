@@ -35,7 +35,8 @@ class App:
             animations=animations,
             sound_player=sound_player,
             dialog_graph=dialog_graph,
-            picture_size=PICTURE_SIZE
+            picture_size=PICTURE_SIZE,
+            select_blip_sound_id="select_blip",
         )
         self._clock = pygame.time.Clock()
 

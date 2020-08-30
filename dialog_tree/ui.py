@@ -42,7 +42,7 @@ class ScreenShake:
 class Ui:
     def __init__(self, surface: Surface, picture_size: Vec2, dialog_node: DialogNode, dialog_font: Font,
         choice_font: Font, images: Dict[str, Surface], animations: Dict[str, List[Surface]], sound_player: SoundPlayer,
-        background: Optional[Surface]):
+        background: Optional[Surface], select_blip_sound_id: str):
         self.surface = surface
         self._picture_size = picture_size
         self._width = surface.get_width()
@@ -52,6 +52,7 @@ class Ui:
         self._animations = animations
         self._sound_player = sound_player
         self._background = background
+        self._select_blip_sound_id = select_blip_sound_id
 
         # MUTABLE STATE BELOW
         self._dialog_node = dialog_node
@@ -121,7 +122,7 @@ class Ui:
 
     def handle_delta_input(self, delta: int):
         if self._choice_buttons and len(self._choice_buttons) > 1:
-            self._sound_player.play("select_blip")
+            self._sound_player.play(self._select_blip_sound_id)
             self._choice_buttons[self._active_choice_index].set_highlighted(False)
             self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
             self._choice_buttons[self._active_choice_index].set_highlighted(True)

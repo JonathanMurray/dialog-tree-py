@@ -12,7 +12,8 @@ from ui import Ui
 class DialogComponent:
 
     def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph, picture_size: Vec2):
+        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph, picture_size: Vec2,
+        select_blip_sound_id: str):
         self._validate_inputs(dialog_graph, images)
         self.surface = surface
         self._sound_player = sound_player
@@ -32,6 +33,7 @@ class DialogComponent:
             animations=animations,
             sound_player=sound_player,
             background=background,
+            select_blip_sound_id=select_blip_sound_id
         )
         self._play_dialog_sound()
 

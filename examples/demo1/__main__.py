@@ -24,7 +24,9 @@ def main():
 
     images = {"demo1_background": filled_surface(picture_component_size, (0, 50, 35))}
     animations = {"demo1_animation": create_animation(picture_component_size)}
-    sound_player = SoundPlayer(sounds={}, text_blip_sound=Sound("examples/demo1/text_blip.ogg"))
+    blip_sound = Sound("examples/demo1/blip.ogg")
+    select_blip_sound_id = "blip"
+    sound_player = SoundPlayer(sounds={select_blip_sound_id: blip_sound}, text_blip_sound=blip_sound)
 
     dialog_graph = DialogGraph(
         root_node_id="ROOT",
@@ -33,7 +35,7 @@ def main():
                 node_id="ROOT",
                 text="This is a minimal demo app. Let this text slowly appear OR click any key to skip it.",
                 graphics=NodeGraphics(animation_id="demo1_animation"),
-                choices=[DialogChoice("Click RETURN to restart!", "ROOT")])
+                choices=[DialogChoice("See this dialog again", "ROOT"), DialogChoice("Restart", "ROOT")])
         ],
         title="DEMO 1",
         background_image_id="demo1_background"
@@ -49,7 +51,8 @@ def main():
         animations=animations,
         sound_player=sound_player,
         dialog_graph=dialog_graph,
-        picture_size=picture_component_size
+        picture_size=picture_component_size,
+        select_blip_sound_id=select_blip_sound_id
     )
 
     clock = Clock()
@@ -65,6 +68,10 @@ def main():
                 dialog_component.on_skip_text_button()
                 if event.key == pygame.K_RETURN:
                     dialog_component.on_action_button()
+                elif event.key == pygame.K_DOWN:
+                    dialog_component.on_delta_button(1)
+                elif event.key == pygame.K_UP:
+                    dialog_component.on_delta_button(-1)
 
         dialog_component.update(elapsed_time)
 
