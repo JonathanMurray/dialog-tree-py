@@ -73,7 +73,12 @@ class Ui:
             animation = Animation(self._animations[graphics.directory], graphics.offset)
         margin = 5
         dialog_box_size = (self._width - margin * 2, 120)
-        self._components = [(Picture(self._background, animation), (0, 0))]
+        if self._background:
+            picture_size = (max(self._background.get_width(), animation.image().get_width()),
+                            max(self._background.get_height(), animation.image().get_height()))
+        else:
+            picture_size = animation.image().get_size()
+        self._components = [(Picture(Surface(picture_size), self._background, animation), (0, 0))]
         if dialog_node.text:
             self._dialog_box = TextBox(
                 self._dialog_font, dialog_box_size, dialog_node.text,
@@ -124,8 +129,9 @@ class Ui:
     def handle_action_input(self) -> Optional[int]:
         if self._choice_buttons:
             return self._active_choice_index
-        else:
-            self._dialog_box.set_cursor_to_end()
+
+    def handle_skip_text_input(self):
+        self._dialog_box.set_cursor_to_end()
 
 
 class Animation:
@@ -145,8 +151,8 @@ class Animation:
 
 class Picture(Component):
 
-    def __init__(self, background: Optional[Surface], animation: Animation):
-        super().__init__(Surface(animation.image().get_size()))
+    def __init__(self, surface: Surface, background: Optional[Surface], animation: Animation):
+        super().__init__(surface)
         self._background = background
         self._animation = animation
         self._redraw()

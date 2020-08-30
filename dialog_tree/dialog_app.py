@@ -46,6 +46,7 @@ class App:
                 _exit_game()
 
             if event.type == pygame.KEYDOWN:
+                self._dialog_component.on_skip_text_button()
                 if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
                     self._dialog_component.on_delta_button(1)
                 if event.key in [pygame.K_UP, pygame.K_LEFT]:
@@ -71,7 +72,7 @@ def start(dialog_filename: Optional[str] = None):
 
     images, animations = load_images()
     sounds = load_sounds()
-    sound_player = SoundPlayer(sounds)
+    sound_player = SoundPlayer(sounds, sounds["text_blip"])
     dialog_filename = dialog_filename or "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
 

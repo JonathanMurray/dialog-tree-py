@@ -13,6 +13,7 @@ class DialogComponent:
 
     def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph, picture_size: Vec2):
+        self._validate_inputs(dialog_graph, images)
         self.surface = surface
         self._sound_player = sound_player
         self._dialog_graph = dialog_graph
@@ -34,12 +35,27 @@ class DialogComponent:
         )
         self._play_dialog_sound()
 
+    @staticmethod
+    def _validate_inputs(dialog_graph: DialogGraph, images: Dict[str, Surface]):
+        for node in dialog_graph.nodes():
+            if node.graphics.image_ids:
+                for image_id in node.graphics.image_ids:
+                    if image_id not in images:
+                        raise ValueError(
+                            f"Invalid config! Graph node '{node.node_id}' refers to missing image: '{image_id}'")
+        background_id = dialog_graph.background_image_id
+        if background_id and background_id not in images:
+            raise ValueError(f"Invalid config! Graph refers to missing background image: '{background_id}'")
+
     def update(self, elapsed_time: Millis):
         self._ui.update(elapsed_time)
         self._sound_player.update(elapsed_time)
 
     def on_delta_button(self, delta: int):
         self._ui.handle_delta_input(delta)
+
+    def on_skip_text_button(self):
+        self._ui.handle_skip_text_input()
 
     def on_action_button(self):
         chosen_index = self._ui.handle_action_input()

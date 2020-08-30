@@ -1,7 +1,7 @@
 from typing import Dict
 
 import pygame.mixer
-from pygame.mixer import Sound, Channel
+from pygame.mixer import Sound
 
 from constants import Millis
 from timing import PeriodicAction
@@ -10,9 +10,10 @@ SOUND_EFFECTS = 1
 
 
 class SoundPlayer:
-    def __init__(self, sounds: Dict[str, Sound]):
+    def __init__(self, sounds: Dict[str, Sound], text_blip_sound: Sound):
         self._sounds = sounds
-        self._blip_channel = Channel(SOUND_EFFECTS)
+        self._text_blip_sound = text_blip_sound
+
         self._periodic_text_blip = PeriodicAction(Millis(75), self._play_queued_text_blip)
         self._text_blip_queued = False
 
@@ -22,7 +23,7 @@ class SoundPlayer:
     def _play_queued_text_blip(self):
         if self._text_blip_queued:
             self._text_blip_queued = False
-            self.play("text_blip")
+            self._text_blip_sound.play()
 
     def play(self, sound_id: str):
         sound = self._sounds[sound_id]
