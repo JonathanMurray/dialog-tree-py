@@ -10,6 +10,7 @@ from pygame.surface import Surface
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog_config_file import load_dialog_from_file
 from dialog_graph import Dialog
+from sound import SoundPlayer
 from ui import Ui
 
 UI_MARGIN = 3
@@ -20,9 +21,9 @@ PICTURE_SIZE = (SCREEN_SIZE[0] - UI_MARGIN * 2, 380)
 class Game:
 
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], sounds: Dict[str, Sound], dialog_graph: Dialog):
+        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: Dialog):
         self._screen = screen
-        self._sounds = sounds
+        self._sound_player = sound_player
         self._dialog_graph = dialog_graph
 
         self._clock = pygame.time.Clock()
@@ -40,10 +41,10 @@ class Game:
             choice_font=choice_font,
             images=images,
             animations=animations,
-            text_blip_sound=sounds["text_blip"],
-            select_blip_sound=sounds["select_blip"],
+            sound_player=sound_player,
             background=background,
         )
+        self._play_dialog_sound()
 
     def run(self):
         while True:
@@ -55,6 +56,7 @@ class Game:
         elapsed_time = Millis(self._clock.tick())
 
         self._ui.update(elapsed_time)
+        self._sound_player.update(elapsed_time)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -66,17 +68,20 @@ class Game:
                 if event.key in [pygame.K_UP, pygame.K_LEFT]:
                     self._ui.try_change_active_choice(-1)
                 if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
-                    self._make_choice()
+                    self._try_make_choice()
 
-    def _make_choice(self):
+    def _try_make_choice(self):
         chosen_index = self._ui.try_make_choice()
         if chosen_index is not None:
             self._dialog_graph.make_choice(chosen_index)
             self._current_dialog_node = self._dialog_graph.current_node()
-            if self._current_dialog_node.sound_id:
-                # TODO stop any currently playing sound effect when going to new screen
-                self._sounds[self._current_dialog_node.sound_id].play()
+            self._play_dialog_sound()
             self._ui.set_dialog(self._current_dialog_node)
+
+    def _play_dialog_sound(self):
+        self._sound_player.stop_all_playing_sounds()
+        if self._current_dialog_node.sound_id:
+            self._sound_player.play(self._current_dialog_node.sound_id)
 
     def _render(self):
         self._screen.fill(BLACK)
@@ -95,12 +100,13 @@ def start(dialog_filename: Optional[str] = None):
 
     images, animations = load_images()
     sounds = load_sounds()
+    sound_player = SoundPlayer(sounds)
     dialog_filename = dialog_filename or "wikipedia_example.json"
     dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption(dialog_graph.title or dialog_filename)
-    game = Game(screen, dialog_font, choice_font, images, animations, sounds, dialog_graph)
+    game = Game(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
     game.run()
 
 
@@ -125,6 +131,7 @@ def load_sounds() -> Dict[str, Sound]:
     for filename in os.listdir(SOUND_DIR):
         filepath = str(Path(SOUND_DIR).joinpath(filename))
         sound = load_sound_file(filepath)
+        sound.set_volume(0.2)
         sounds[str(filename).split(".")[0]] = sound
     print(f"Loaded {len(sounds)} sound files.")
     return sounds

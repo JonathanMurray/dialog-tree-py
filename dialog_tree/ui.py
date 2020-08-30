@@ -1,16 +1,17 @@
 from abc import ABC
 from random import randint
-from typing import Tuple, Callable, List, Any, Optional, Dict
+from typing import Tuple, List, Optional, Dict
 
 import pygame
 from pygame.font import Font
-from pygame.mixer import Sound
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from constants import WHITE, GREEN, BLACK, Vec2, Vec3, Millis
 from dialog_graph import DialogNode
+from sound import SoundPlayer
 from text_util import layout_text_in_area
+from timing import PeriodicAction
 
 
 class Component(ABC):
@@ -40,8 +41,8 @@ class ScreenShake:
 
 class Ui:
     def __init__(self, surface: Surface, picture_size: Vec2, dialog_node: DialogNode, dialog_font: Font,
-        choice_font: Font, images: Dict[str, Surface], animations: Dict[str, List[Surface]], text_blip_sound: Sound,
-        select_blip_sound: Sound, background: Optional[Surface]):
+        choice_font: Font, images: Dict[str, Surface], animations: Dict[str, List[Surface]], sound_player: SoundPlayer,
+        background: Optional[Surface]):
         self.surface = surface
         self._picture_size = picture_size
         self._width = surface.get_width()
@@ -49,8 +50,7 @@ class Ui:
         self._choice_font = choice_font
         self._images = images
         self._animations = animations
-        self._text_blip_sound = text_blip_sound
-        self._select_blip_sound = select_blip_sound
+        self._sound_player = sound_player
         self._background = background
 
         # MUTABLE STATE BELOW
@@ -77,7 +77,7 @@ class Ui:
         if dialog_node.text:
             self._dialog_box = TextBox(
                 self._dialog_font, dialog_box_size, dialog_node.text,
-                border_color=(150, 150, 150), text_color=(255, 255, 255), blip_sound=self._text_blip_sound)
+                border_color=(150, 150, 150), text_color=(255, 255, 255), sound_player=self._sound_player)
             self._components.append(
                 (self._dialog_box, (margin, self._picture_size[1] - dialog_box_size[1] - margin)))
         self._choice_buttons = []
@@ -114,7 +114,7 @@ class Ui:
 
     def try_change_active_choice(self, delta: int):
         if self._choice_buttons and len(self._choice_buttons) > 1:
-            self._select_blip_sound.play()
+            self._sound_player.play("select_blip")
             self._choice_buttons[self._active_choice_index].set_highlighted(False)
             self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
             self._choice_buttons[self._active_choice_index].set_highlighted(True)
@@ -122,19 +122,6 @@ class Ui:
     def try_make_choice(self) -> Optional[int]:
         if self._choice_buttons:
             return self._active_choice_index
-
-
-class PeriodicAction:
-    def __init__(self, cooldown: Millis, callback: Callable[[], Any]):
-        self._cooldown = cooldown
-        self._callback = callback
-        self._time_since_last_action = 0
-
-    def update(self, elapsed_time: Millis):
-        self._time_since_last_action += elapsed_time
-        if self._time_since_last_action >= self._cooldown:
-            self._time_since_last_action -= self._cooldown
-            self._callback()
 
 
 class Animation:
@@ -204,7 +191,8 @@ class ChoiceButton(Component):
 
 
 class TextBox(Component):
-    def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3, blip_sound: Sound):
+    def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3,
+        sound_player: SoundPlayer):
         super().__init__(Surface(size))
         self.surface.set_alpha(180)
 
@@ -214,7 +202,7 @@ class TextBox(Component):
         self._font = font
         self._border_color = border_color
         self._text_color = text_color
-        self._blip_sound = blip_sound
+        self._sound_player = sound_player
         self._lines = self._split_into_lines(text)
         self._cursor = 0
         self._max_cursor_position = max(0, len(text) - 1)
@@ -224,7 +212,7 @@ class TextBox(Component):
 
     def _advance_cursor(self):
         if self._cursor < self._max_cursor_position:
-            self._blip_sound.play()
+            self._sound_player.play_text_blip()
             self._cursor += 1
             self._redraw()
 
