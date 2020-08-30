@@ -6,7 +6,7 @@ from pathlib import Path
 from graphviz import Digraph
 
 from constants import DIALOG_DIR
-from dialog_config_file import load_dialog_from_file
+from config_file import load_dialog_from_file
 from graph import DialogGraph
 from text_util import layout_text_in_area
 

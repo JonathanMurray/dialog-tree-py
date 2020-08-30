@@ -1,6 +1,6 @@
 import pytest
 
-from dialog_config_file import parse_dialog_from_json
+from config_file import parse_dialog_from_json
 
 
 def test_empty_invalid():
