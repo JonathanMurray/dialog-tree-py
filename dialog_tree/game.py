@@ -18,23 +18,20 @@ SCREEN_SIZE = 500, 500
 PICTURE_SIZE = (SCREEN_SIZE[0] - UI_MARGIN * 2, 380)
 
 
-class Game:
+class DialogComponent:
 
-    def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
+    def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: Dialog):
-        self._screen = screen
+        self.surface = surface
         self._sound_player = sound_player
         self._dialog_graph = dialog_graph
 
-        self._clock = pygame.time.Clock()
-
         self._current_dialog_node = self._dialog_graph.current_node()
 
-        ui_size = (screen.get_width() - UI_MARGIN * 2, screen.get_height() - UI_MARGIN * 2)
         background_id = self._dialog_graph.background_image_id
         background = images[background_id] if background_id else None
         self._ui = Ui(
-            surface=Surface(ui_size),
+            surface=surface,
             picture_size=PICTURE_SIZE,
             dialog_node=self._current_dialog_node,
             dialog_font=dialog_font,
@@ -46,31 +43,14 @@ class Game:
         )
         self._play_dialog_sound()
 
-    def run(self):
-        while True:
-            self._update()
-            self._render()
-
-    def _update(self):
-
-        elapsed_time = Millis(self._clock.tick())
-
+    def update(self, elapsed_time: Millis):
         self._ui.update(elapsed_time)
         self._sound_player.update(elapsed_time)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                _exit_game()
+    def on_delta_button(self, delta: int):
+        self._ui.handle_delta_input(delta)
 
-            if event.type == pygame.KEYDOWN:
-                if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
-                    self._ui.handle_delta_input(1)
-                if event.key in [pygame.K_UP, pygame.K_LEFT]:
-                    self._ui.handle_delta_input(-1)
-                if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
-                    self._on_action_button()
-
-    def _on_action_button(self):
+    def on_action_button(self):
         chosen_index = self._ui.handle_action_input()
         if chosen_index is not None:
             self._dialog_graph.make_choice(chosen_index)
@@ -83,10 +63,52 @@ class Game:
         if self._current_dialog_node.sound_id:
             self._sound_player.play(self._current_dialog_node.sound_id)
 
-    def _render(self):
-        self._screen.fill(BLACK)
+    def redraw(self):
         self._ui.redraw()
-        self._screen.blit(self._ui.surface, (UI_MARGIN, UI_MARGIN))
+
+
+class DemoGame:
+    def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
+        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: Dialog):
+        self._screen = screen
+        self._dialog_component = DialogComponent(
+            surface=Surface((SCREEN_SIZE[0] - UI_MARGIN * 2, SCREEN_SIZE[1] - UI_MARGIN * 2)),
+            dialog_font=dialog_font,
+            choice_font=choice_font,
+            images=images,
+            animations=animations,
+            sound_player=sound_player,
+            dialog_graph=dialog_graph
+        )
+        self._clock = pygame.time.Clock()
+
+    def run(self):
+        while True:
+            self._handle_events()
+            self._update()
+            self._render()
+
+    def _handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                _exit_game()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
+                    self._dialog_component.on_delta_button(1)
+                if event.key in [pygame.K_UP, pygame.K_LEFT]:
+                    self._dialog_component.on_delta_button(-1)
+                if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
+                    self._dialog_component.on_action_button()
+
+    def _update(self):
+        elapsed_time = Millis(self._clock.tick())
+        self._dialog_component.update(elapsed_time)
+
+    def _render(self):
+        self._dialog_component.redraw()
+        self._screen.fill(BLACK)
+        self._screen.blit(self._dialog_component.surface, (UI_MARGIN, UI_MARGIN))
         pygame.display.update()
 
 
@@ -106,7 +128,7 @@ def start(dialog_filename: Optional[str] = None):
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption(dialog_graph.title or dialog_filename)
-    game = Game(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
+    game = DemoGame(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
     game.run()
 
 
