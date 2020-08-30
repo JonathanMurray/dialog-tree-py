@@ -7,7 +7,7 @@ from graphviz import Digraph
 
 from constants import DIALOG_DIR
 from dialog_config_file import load_dialog_from_file
-from dialog_graph import DialogGraph
+from graph import DialogGraph
 from text_util import layout_text_in_area
 
 TMP_DIR = Path(".tmpfiles")

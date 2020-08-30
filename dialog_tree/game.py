@@ -9,7 +9,7 @@ from pygame.surface import Surface
 
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog_config_file import load_dialog_from_file
-from dialog_graph import DialogGraph
+from graph import DialogGraph
 from sound import SoundPlayer
 from ui import Ui
 

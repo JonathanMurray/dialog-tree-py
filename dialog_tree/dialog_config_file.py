@@ -2,7 +2,7 @@ import json
 from typing import List, Dict
 
 from constants import Millis
-from dialog_graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
+from graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
 
 
 def load_dialog_from_file(file_path: str) -> DialogGraph:

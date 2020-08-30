@@ -8,7 +8,7 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 
 from constants import WHITE, GREEN, BLACK, Vec2, Vec3, Millis
-from dialog_graph import DialogNode
+from graph import DialogNode
 from sound import SoundPlayer
 from text_util import layout_text_in_area
 from timing import PeriodicAction

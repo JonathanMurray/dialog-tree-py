@@ -1,4 +1,4 @@
-from dialog_graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
+from graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
 from graph_visualization import generate_graphviz
 
 
