@@ -11,7 +11,7 @@
           "animation_dir": "lawyer_paper",
           "offset": [
             0,
-            40
+            70
           ]
         },
         "choices": [
@@ -53,7 +53,7 @@
           "animation_dir": "lawyer_forward",
           "offset": [
             0,
-            40
+            60
           ]
         },
         "choices": [
@@ -72,6 +72,7 @@
         "text": "",
         "sound": "hold_it",
         "graphics": {
+          "screen_shake": 300,
           "image": "hold_it"
         },
         "choices": [
@@ -88,7 +89,7 @@
           "animation_dir": "lawyer_forward",
           "offset": [
             0,
-            40
+            50
           ]
         },
         "choices": [
@@ -105,7 +106,7 @@
           "animation_dir": "lawyer_embarrassed",
           "offset": [
             0,
-            40
+            70
           ]
         },
         "choices": [
@@ -120,6 +121,7 @@
         "text": "",
         "sound": "take_that",
         "graphics": {
+          "screen_shake": 300,
           "image": "take_that"
         },
         "choices": [
@@ -137,7 +139,7 @@
           "animation_dir": "lawyer_triumph",
           "offset": [
             0,
-            40
+            70
           ]
         },
         "choices": [

@@ -21,11 +21,11 @@ def test_load_simple_sequence():
     dialog_graph = parse_dialog_from_json(dialog_json)
 
     assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().animation_ref.image_ids == ["image 1"]
+    assert dialog_graph.current_node().graphics.image_ids == ["image 1"]
     assert dialog_graph.current_node().choices[0].text == "Next"
     dialog_graph.make_choice(0)
     assert dialog_graph.current_node().text == "text 2"
-    assert dialog_graph.current_node().animation_ref.image_ids == ["image 2"]
+    assert dialog_graph.current_node().graphics.image_ids == ["image 2"]
     assert dialog_graph.current_node().choices[0].text == "Play from beginning"
 
 
@@ -70,11 +70,11 @@ def test_load_graph():
     dialog_graph = parse_dialog_from_json(dialog_json)
 
     assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().animation_ref.image_ids == ["image 1"]
+    assert dialog_graph.current_node().graphics.image_ids == ["image 1"]
     assert [c.text for c in dialog_graph.current_node().choices] == ["stay here", "go next"]
     dialog_graph.make_choice(1)
     assert dialog_graph.current_node().text == "text 2"
-    assert dialog_graph.current_node().animation_ref.image_ids == ["image 2"]
+    assert dialog_graph.current_node().graphics.image_ids == ["image 2"]
     assert [c.text for c in dialog_graph.current_node().choices] == ["go back"]
 
 
@@ -97,7 +97,7 @@ def test_load_graph_with_animation():
     dialog_graph = parse_dialog_from_json(dialog_json)
 
     assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().animation_ref.image_ids == ["frame 1", "frame 2"]
+    assert dialog_graph.current_node().graphics.image_ids == ["frame 1", "frame 2"]
     assert dialog_graph.current_node().choices == []
 
 
@@ -120,5 +120,5 @@ def test_load_graph_with_animation_dir():
     dialog_graph = parse_dialog_from_json(dialog_json)
 
     assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().animation_ref.directory == "directory_with_images"
+    assert dialog_graph.current_node().graphics.directory == "directory_with_images"
     assert dialog_graph.current_node().choices == []

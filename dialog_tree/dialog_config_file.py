@@ -1,7 +1,8 @@
 import json
 from typing import List, Dict
 
-from dialog_graph import Dialog, DialogNode, DialogChoice, AnimationRef
+from constants import Millis
+from dialog_graph import Dialog, DialogNode, DialogChoice, NodeGraphics
 
 
 def load_dialog_from_file(file_path: str) -> Dialog:
@@ -28,15 +29,15 @@ def _parse_sequence_json(sequence_json) -> Dialog:
     initial_step = sequence_json[0]
     next_text = "Next"
     nodes = [
-        DialogNode(root_id, initial_step[0], AnimationRef.of_image_ids([initial_step[1]]),
+        DialogNode(root_id, initial_step[0], NodeGraphics(image_ids=[initial_step[1]]),
                    [DialogChoice(next_text, "1")])]
     for i in range(1, len(sequence_json) - 1):
         step = sequence_json[i]
         nodes.append(
-            DialogNode(str(i), step[0], AnimationRef.of_image_ids([step[1]]), [DialogChoice(next_text, str(i + 1))]))
+            DialogNode(str(i), step[0], NodeGraphics(image_ids=[step[1]]), [DialogChoice(next_text, str(i + 1))]))
     last_step = sequence_json[-1]
     nodes.append(
-        DialogNode(str(len(sequence_json) - 1), last_step[0], AnimationRef.of_image_ids([last_step[1]]),
+        DialogNode(str(len(sequence_json) - 1), last_step[0], NodeGraphics(image_ids=[last_step[1]]),
                    [DialogChoice("Play from beginning", root_id)]))
     return Dialog(root_id, nodes)
 
@@ -47,18 +48,20 @@ def _parse_graph_json(graph_json) -> Dialog:
 
     def parse_node(node) -> DialogNode:
         graphics = node["graphics"]
+        offset = graphics.get("offset", None)
+        screen_shake = Millis(graphics["screen_shake"]) if "screen_shake" in graphics else None
         if "image" in graphics:
-            animation_ref = AnimationRef.of_image_ids([graphics["image"]], graphics.get("offset", None))
+            node_graphics = NodeGraphics(image_ids=[graphics["image"]], offset=offset, screen_shake=screen_shake)
         elif "animation" in graphics:
-            animation_ref = AnimationRef.of_image_ids(graphics["animation"], graphics.get("offset", None))
+            node_graphics = NodeGraphics(image_ids=graphics["animation"], offset=offset, screen_shake=screen_shake)
         elif "animation_dir" in graphics:
-            animation_ref = AnimationRef.of_directory(graphics["animation_dir"], graphics.get("offset", None))
+            node_graphics = NodeGraphics(directory=graphics["animation_dir"], offset=offset, screen_shake=screen_shake)
         else:
             raise ValueError(f"Missing image/animation config for node!")
         return DialogNode(
             node_id=node["id"],
             text=node["text"],
-            animation_ref=animation_ref,
+            graphics=node_graphics,
             choices=[parse_choice(choice) for choice in node["choices"]],
             sound_id=node.get("sound", None))
 
