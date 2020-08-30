@@ -8,10 +8,15 @@ from pygame.mixer import Sound
 from pygame.surface import Surface
 
 from config_file import load_dialog_from_file
-from constants import BLACK, FONT_DIR, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
+from constants import BLACK, Millis
 from dialog import DialogComponent
 from graph import DialogGraph
 from sound import SoundPlayer
+
+FONT_DIR = "resources/fonts"
+IMG_DIR = "resources/images"
+SOUND_DIR = "resources/sounds"
+DIALOG_DIR = "resources/dialog"
 
 UI_MARGIN = 3
 SCREEN_SIZE = 500, 500

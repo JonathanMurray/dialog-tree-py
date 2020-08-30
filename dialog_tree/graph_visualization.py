@@ -5,12 +5,12 @@ from pathlib import Path
 
 from graphviz import Digraph
 
-from constants import DIALOG_DIR
 from config_file import load_dialog_from_file
 from graph import DialogGraph
 from text_util import layout_text_in_area
 
 TMP_DIR = Path(".tmpfiles")
+DIALOG_DIR = "resources/dialog"
 
 
 def generate_graphviz(graph_name: str, dialog_graph: DialogGraph) -> Digraph:

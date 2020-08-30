@@ -6,8 +6,6 @@ from pygame.mixer import Sound
 from constants import Millis
 from timing import PeriodicAction
 
-SOUND_EFFECTS = 1
-
 
 class SoundPlayer:
     def __init__(self, sounds: Dict[str, Sound], text_blip_sound: Sound):
