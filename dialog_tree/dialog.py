@@ -67,6 +67,9 @@ class DialogComponent:
             self._play_dialog_sound()
             self._ui.set_dialog(self._current_dialog_node)
 
+    def current_node_id(self) -> str:
+        return self._current_dialog_node.node_id
+
     def _play_dialog_sound(self):
         self._sound_player.stop_all_playing_sounds()
         if self._current_dialog_node.sound_id:
