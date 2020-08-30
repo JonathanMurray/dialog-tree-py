@@ -74,12 +74,7 @@ class Ui:
             animation = Animation(self._animations[graphics.animation_id], graphics.offset)
         margin = 5
         dialog_box_size = (self._width - margin * 2, 120)
-        if self._background:
-            picture_size = (max(self._background.get_width(), animation.image().get_width()),
-                            max(self._background.get_height(), animation.image().get_height()))
-        else:
-            picture_size = animation.image().get_size()
-        self._components = [(Picture(Surface(picture_size), self._background, animation), (0, 0))]
+        self._components = [(Picture(Surface(self._picture_size), self._background, animation), (0, 0))]
         if dialog_node.text:
             self._dialog_box = TextBox(
                 self._dialog_font, dialog_box_size, dialog_node.text,
