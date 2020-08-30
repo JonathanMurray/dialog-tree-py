@@ -7,67 +7,18 @@ from pygame.font import Font
 from pygame.mixer import Sound
 from pygame.surface import Surface
 
-from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from config_file import load_dialog_from_file
+from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
+from dialog import DialogComponent
 from graph import DialogGraph
 from sound import SoundPlayer
-from ui import Ui
 
 UI_MARGIN = 3
 SCREEN_SIZE = 500, 500
 PICTURE_SIZE = (SCREEN_SIZE[0] - UI_MARGIN * 2, 380)
 
 
-class DialogComponent:
-
-    def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph):
-        self.surface = surface
-        self._sound_player = sound_player
-        self._dialog_graph = dialog_graph
-
-        self._current_dialog_node = self._dialog_graph.current_node()
-
-        background_id = self._dialog_graph.background_image_id
-        background = images[background_id] if background_id else None
-        self._ui = Ui(
-            surface=surface,
-            picture_size=PICTURE_SIZE,
-            dialog_node=self._current_dialog_node,
-            dialog_font=dialog_font,
-            choice_font=choice_font,
-            images=images,
-            animations=animations,
-            sound_player=sound_player,
-            background=background,
-        )
-        self._play_dialog_sound()
-
-    def update(self, elapsed_time: Millis):
-        self._ui.update(elapsed_time)
-        self._sound_player.update(elapsed_time)
-
-    def on_delta_button(self, delta: int):
-        self._ui.handle_delta_input(delta)
-
-    def on_action_button(self):
-        chosen_index = self._ui.handle_action_input()
-        if chosen_index is not None:
-            self._dialog_graph.make_choice(chosen_index)
-            self._current_dialog_node = self._dialog_graph.current_node()
-            self._play_dialog_sound()
-            self._ui.set_dialog(self._current_dialog_node)
-
-    def _play_dialog_sound(self):
-        self._sound_player.stop_all_playing_sounds()
-        if self._current_dialog_node.sound_id:
-            self._sound_player.play(self._current_dialog_node.sound_id)
-
-    def redraw(self):
-        self._ui.redraw()
-
-
-class DemoGame:
+class App:
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph):
         self._screen = screen
@@ -78,7 +29,8 @@ class DemoGame:
             images=images,
             animations=animations,
             sound_player=sound_player,
-            dialog_graph=dialog_graph
+            dialog_graph=dialog_graph,
+            picture_size=PICTURE_SIZE
         )
         self._clock = pygame.time.Clock()
 
@@ -128,8 +80,8 @@ def start(dialog_filename: Optional[str] = None):
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption(dialog_graph.title or dialog_filename)
-    game = DemoGame(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
-    game.run()
+    app = App(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
+    app.run()
 
 
 def load_images() -> Tuple[Dict[str, Surface], Dict[str, List[Surface]]]:
