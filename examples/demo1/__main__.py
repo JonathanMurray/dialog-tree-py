@@ -23,7 +23,7 @@ def main():
     screen = pygame.display.set_mode(screen_size)
 
     images = {"demo1_background": filled_surface(picture_component_size, (0, 50, 35))}
-    animations = {"demo1_animation_dir": create_animation(picture_component_size)}
+    animations = {"demo1_animation": create_animation(picture_component_size)}
     sound_player = SoundPlayer(sounds={}, text_blip_sound=Sound("examples/demo1/text_blip.ogg"))
 
     dialog_graph = DialogGraph(
@@ -32,7 +32,7 @@ def main():
             DialogNode(
                 node_id="ROOT",
                 text="This is a minimal demo app. Let this text slowly appear OR click any key to skip it.",
-                graphics=NodeGraphics(directory="demo1_animation_dir"),
+                graphics=NodeGraphics(animation_id="demo1_animation"),
                 choices=[DialogChoice("Click RETURN to restart!", "ROOT")])
         ],
         title="DEMO 1",

@@ -101,7 +101,7 @@ def test_load_graph_with_animation():
     assert dialog_graph.current_node().choices == []
 
 
-def test_load_graph_with_animation_dir():
+def test_load_graph_with_animation():
     dialog_json = {
         "graph": {
             "root": "1",
@@ -110,7 +110,7 @@ def test_load_graph_with_animation_dir():
                     "id": "1",
                     "text": "text 1",
                     "graphics": {
-                        "animation_dir": "directory_with_images",
+                        "animation": "animation 1",
                     },
                     "choices": []
                 }
@@ -120,5 +120,5 @@ def test_load_graph_with_animation_dir():
     dialog_graph = parse_dialog_from_json(dialog_json)
 
     assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().graphics.directory == "directory_with_images"
+    assert dialog_graph.current_node().graphics.animation_id == "animation 1"
     assert dialog_graph.current_node().choices == []

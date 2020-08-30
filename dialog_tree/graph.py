@@ -11,10 +11,10 @@ class DialogChoice:
 
 class NodeGraphics:
 
-    def __init__(self, directory: Optional[str] = None, image_ids: Optional[List[str]] = None,
+    def __init__(self, animation_id: Optional[str] = None, image_ids: Optional[List[str]] = None,
         offset: Optional[Vec2] = None, screen_shake: Optional[Millis] = None,
         instant_text: bool = False):
-        self.directory = directory
+        self.animation_id = animation_id
         self.image_ids = image_ids
         self.offset: Vec2 = offset or (0, 0)
         self.screen_shake = screen_shake

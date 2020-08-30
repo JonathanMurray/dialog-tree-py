@@ -70,7 +70,7 @@ class Ui:
         if graphics.image_ids:
             animation = Animation([self._images[i] for i in graphics.image_ids], graphics.offset)
         else:
-            animation = Animation(self._animations[graphics.directory], graphics.offset)
+            animation = Animation(self._animations[graphics.animation_id], graphics.offset)
         margin = 5
         dialog_box_size = (self._width - margin * 2, 120)
         if self._background:
