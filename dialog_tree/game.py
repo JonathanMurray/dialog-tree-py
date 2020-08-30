@@ -64,14 +64,14 @@ class Game:
 
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
-                    self._ui.try_change_active_choice(1)
+                    self._ui.handle_delta_input(1)
                 if event.key in [pygame.K_UP, pygame.K_LEFT]:
-                    self._ui.try_change_active_choice(-1)
+                    self._ui.handle_delta_input(-1)
                 if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
-                    self._try_make_choice()
+                    self._on_action_button()
 
-    def _try_make_choice(self):
-        chosen_index = self._ui.try_make_choice()
+    def _on_action_button(self):
+        chosen_index = self._ui.handle_action_input()
         if chosen_index is not None:
             self._dialog_graph.make_choice(chosen_index)
             self._current_dialog_node = self._dialog_graph.current_node()

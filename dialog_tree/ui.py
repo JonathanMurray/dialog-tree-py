@@ -114,16 +114,18 @@ class Ui:
         if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
             self._add_choice_buttons()
 
-    def try_change_active_choice(self, delta: int):
+    def handle_delta_input(self, delta: int):
         if self._choice_buttons and len(self._choice_buttons) > 1:
             self._sound_player.play("select_blip")
             self._choice_buttons[self._active_choice_index].set_highlighted(False)
             self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
             self._choice_buttons[self._active_choice_index].set_highlighted(True)
 
-    def try_make_choice(self) -> Optional[int]:
+    def handle_action_input(self) -> Optional[int]:
         if self._choice_buttons:
             return self._active_choice_index
+        else:
+            self._dialog_box.set_cursor_to_end()
 
 
 class Animation:
