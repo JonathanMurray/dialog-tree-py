@@ -50,12 +50,16 @@ def _parse_graph_json(graph_json) -> Dialog:
         graphics = node["graphics"]
         offset = graphics.get("offset", None)
         screen_shake = Millis(graphics["screen_shake"]) if "screen_shake" in graphics else None
+        instant_text = graphics.get("instant_text", False)
         if "image" in graphics:
-            node_graphics = NodeGraphics(image_ids=[graphics["image"]], offset=offset, screen_shake=screen_shake)
+            node_graphics = NodeGraphics(image_ids=[graphics["image"]], offset=offset, screen_shake=screen_shake,
+                                         instant_text=instant_text)
         elif "animation" in graphics:
-            node_graphics = NodeGraphics(image_ids=graphics["animation"], offset=offset, screen_shake=screen_shake)
+            node_graphics = NodeGraphics(image_ids=graphics["animation"], offset=offset, screen_shake=screen_shake,
+                                         instant_text=instant_text)
         elif "animation_dir" in graphics:
-            node_graphics = NodeGraphics(directory=graphics["animation_dir"], offset=offset, screen_shake=screen_shake)
+            node_graphics = NodeGraphics(directory=graphics["animation_dir"], offset=offset, screen_shake=screen_shake,
+                                         instant_text=instant_text)
         else:
             raise ValueError(f"Missing image/animation config for node!")
         return DialogNode(

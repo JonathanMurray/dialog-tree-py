@@ -80,6 +80,8 @@ class Ui:
                 border_color=(150, 150, 150), text_color=(255, 255, 255), sound_player=self._sound_player)
             self._components.append(
                 (self._dialog_box, (margin, self._picture_size[1] - dialog_box_size[1] - margin)))
+            if dialog_node.graphics.instant_text:
+                self._dialog_box.set_cursor_to_end()
         self._choice_buttons = []
         if graphics.screen_shake:
             self._screen_shake.start(graphics.screen_shake)
@@ -218,6 +220,10 @@ class TextBox(Component):
 
     def update(self, elapsed_time: Millis):
         self._periodic_cursor_advance.update(elapsed_time)
+
+    def set_cursor_to_end(self):
+        self._cursor = self._max_cursor_position
+        self._redraw()
 
     def is_cursor_at_end(self) -> bool:
         return self._cursor == self._max_cursor_position

@@ -140,7 +140,8 @@
           "offset": [
             0,
             70
-          ]
+          ],
+          "instant_text": true
         },
         "choices": [
           [
