@@ -8,7 +8,7 @@ from pygame.mixer import Sound
 from pygame.surface import Surface
 
 from config_file import load_dialog_from_file
-from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
+from constants import BLACK, FONT_DIR, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog import DialogComponent
 from graph import DialogGraph
 from sound import SoundPlayer
@@ -68,9 +68,6 @@ def start(dialog_filename: Optional[str] = None):
     pygame.init()
     dialog_font = Font(f"{FONT_DIR}/Monaco.dfont", 17)
     choice_font = Font(f"{FONT_DIR}/Monaco.dfont", 15)
-
-    pygame.display.init()
-    pygame.time.set_timer(EVENT_INTERVAL, 40)
 
     images, animations = load_images()
     sounds = load_sounds()
