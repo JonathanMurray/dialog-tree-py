@@ -9,7 +9,7 @@ from pygame.surface import Surface
 
 from constants import BLACK, FONT_DIR, EVENT_INTERVAL, IMG_DIR, DIALOG_DIR, Millis, SOUND_DIR
 from dialog_config_file import load_dialog_from_file
-from dialog_graph import Dialog
+from dialog_graph import DialogGraph
 from sound import SoundPlayer
 from ui import Ui
 
@@ -21,7 +21,7 @@ PICTURE_SIZE = (SCREEN_SIZE[0] - UI_MARGIN * 2, 380)
 class DialogComponent:
 
     def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: Dialog):
+        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph):
         self.surface = surface
         self._sound_player = sound_player
         self._dialog_graph = dialog_graph
@@ -69,7 +69,7 @@ class DialogComponent:
 
 class DemoGame:
     def __init__(self, screen: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
-        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: Dialog):
+        animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph):
         self._screen = screen
         self._dialog_component = DialogComponent(
             surface=Surface((SCREEN_SIZE[0] - UI_MARGIN * 2, SCREEN_SIZE[1] - UI_MARGIN * 2)),

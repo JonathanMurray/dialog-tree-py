@@ -7,13 +7,13 @@ from graphviz import Digraph
 
 from constants import DIALOG_DIR
 from dialog_config_file import load_dialog_from_file
-from dialog_graph import Dialog
+from dialog_graph import DialogGraph
 from text_util import layout_text_in_area
 
 TMP_DIR = Path(".tmpfiles")
 
 
-def generate_graphviz(graph_name: str, dialog_graph: Dialog) -> Digraph:
+def generate_graphviz(graph_name: str, dialog_graph: DialogGraph) -> Digraph:
     graph = Digraph(
         name=graph_name,
         comment=f"generated with Graphviz from {graph_name}",

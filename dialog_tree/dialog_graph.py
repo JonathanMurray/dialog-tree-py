@@ -33,7 +33,7 @@ class DialogNode:
         self.sound_id = sound_id
 
 
-class Dialog:
+class DialogGraph:
     def __init__(self, root_node_id: str, nodes: List[DialogNode], title: Optional[str] = None,
         background_image_id: Optional[str] = None):
         self.title = title

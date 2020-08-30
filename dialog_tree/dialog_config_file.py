@@ -2,16 +2,16 @@ import json
 from typing import List, Dict
 
 from constants import Millis
-from dialog_graph import Dialog, DialogNode, DialogChoice, NodeGraphics
+from dialog_graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
 
 
-def load_dialog_from_file(file_path: str) -> Dialog:
+def load_dialog_from_file(file_path: str) -> DialogGraph:
     print(f"Loading dialog: {file_path}")
     with open(file_path) as f:
         return parse_dialog_from_json(json.load(f))
 
 
-def parse_dialog_from_json(dialog_json: Dict) -> Dialog:
+def parse_dialog_from_json(dialog_json: Dict) -> DialogGraph:
     if "graph" in dialog_json:
         dialog_graph = _parse_graph_json(dialog_json["graph"])
     elif "sequence" in dialog_json:
@@ -24,7 +24,7 @@ def parse_dialog_from_json(dialog_json: Dict) -> Dialog:
     return dialog_graph
 
 
-def _parse_sequence_json(sequence_json) -> Dialog:
+def _parse_sequence_json(sequence_json) -> DialogGraph:
     root_id = "START"
     initial_step = sequence_json[0]
     next_text = "Next"
@@ -39,10 +39,10 @@ def _parse_sequence_json(sequence_json) -> Dialog:
     nodes.append(
         DialogNode(str(len(sequence_json) - 1), last_step[0], NodeGraphics(image_ids=[last_step[1]]),
                    [DialogChoice("Play from beginning", root_id)]))
-    return Dialog(root_id, nodes)
+    return DialogGraph(root_id, nodes)
 
 
-def _parse_graph_json(graph_json) -> Dialog:
+def _parse_graph_json(graph_json) -> DialogGraph:
     def parse_choice(array: List[str]) -> DialogChoice:
         return DialogChoice(array[0], array[1])
 
@@ -69,4 +69,4 @@ def _parse_graph_json(graph_json) -> Dialog:
             choices=[parse_choice(choice) for choice in node["choices"]],
             sound_id=node.get("sound", None))
 
-    return Dialog(graph_json["root"], [parse_node(node) for node in graph_json["nodes"]])
+    return DialogGraph(graph_json["root"], [parse_node(node) for node in graph_json["nodes"]])
