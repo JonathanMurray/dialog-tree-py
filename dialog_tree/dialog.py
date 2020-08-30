@@ -62,10 +62,21 @@ class DialogComponent:
     def on_action_button(self):
         chosen_index = self._ui.handle_action_input()
         if chosen_index is not None:
-            self._dialog_graph.make_choice(chosen_index)
-            self._current_dialog_node = self._dialog_graph.current_node()
-            self._play_dialog_sound()
-            self._ui.set_dialog(self._current_dialog_node)
+            self._make_choice(chosen_index)
+
+    def on_mouse_click(self, ui_coordinates: Vec2):
+        chosen_index = self._ui.handle_mouse_click_input(ui_coordinates)
+        if chosen_index is not None:
+            self._make_choice(chosen_index)
+
+    def on_mouse_hover(self, ui_coordinates: Vec2):
+        self._ui.handle_mouse_hover_input(ui_coordinates)
+
+    def _make_choice(self, chosen_index: int):
+        self._dialog_graph.make_choice(chosen_index)
+        self._current_dialog_node = self._dialog_graph.current_node()
+        self._play_dialog_sound()
+        self._ui.set_dialog(self._current_dialog_node)
 
     def current_node_id(self) -> str:
         return self._current_dialog_node.node_id

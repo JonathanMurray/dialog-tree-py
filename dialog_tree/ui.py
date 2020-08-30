@@ -123,9 +123,13 @@ class Ui:
     def handle_delta_input(self, delta: int):
         if self._choice_buttons and len(self._choice_buttons) > 1:
             self._sound_player.play(self._select_blip_sound_id)
-            self._choice_buttons[self._active_choice_index].set_highlighted(False)
-            self._active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
-            self._choice_buttons[self._active_choice_index].set_highlighted(True)
+            active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
+            self._set_active_choice_index(active_choice_index)
+
+    def _set_active_choice_index(self, active_choice_index: int):
+        self._choice_buttons[self._active_choice_index].set_highlighted(False)
+        self._active_choice_index = active_choice_index
+        self._choice_buttons[self._active_choice_index].set_highlighted(True)
 
     def handle_action_input(self) -> Optional[int]:
         if self._choice_buttons:
@@ -133,6 +137,22 @@ class Ui:
 
     def handle_skip_text_input(self):
         self._dialog_box.set_cursor_to_end()
+
+    def handle_mouse_click_input(self, ui_coordinates: Vec2) -> Optional[int]:
+        return self._get_intersecting_choice_button_index(ui_coordinates)
+
+    def handle_mouse_hover_input(self, ui_coordinates: Vec2):
+        choice_index = self._get_intersecting_choice_button_index(ui_coordinates)
+        if choice_index is not None and choice_index != self._active_choice_index:
+            self._sound_player.play(self._select_blip_sound_id)
+            self._set_active_choice_index(choice_index)
+
+    def _get_intersecting_choice_button_index(self, ui_coordinates: Vec2) -> Optional[int]:
+        for choice_index, (component, position) in enumerate((c for c in self._components
+                                                              if isinstance(c[0], ChoiceButton))):
+            rect = Rect(position, component.surface.get_size())
+            if rect.collidepoint(ui_coordinates):
+                return choice_index
 
 
 class Animation:
