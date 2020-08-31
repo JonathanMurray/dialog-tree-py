@@ -52,13 +52,13 @@ class App:
                 _exit_game()
 
             if event.type == pygame.KEYDOWN:
-                self._dialog_component.on_skip_text_button()
+                self._dialog_component.skip_text()
                 if event.key in [pygame.K_DOWN, pygame.K_RIGHT]:
-                    self._dialog_component.on_delta_button(1)
+                    self._dialog_component.move_choice_selection(1)
                 if event.key in [pygame.K_UP, pygame.K_LEFT]:
-                    self._dialog_component.on_delta_button(-1)
+                    self._dialog_component.move_choice_selection(-1)
                 if event.key in [pygame.K_SPACE, pygame.K_RETURN]:
-                    self._dialog_component.on_action_button()
+                    self._dialog_component.commit_selected_choice()
 
     def _update(self):
         elapsed_time = Millis(self._clock.tick())

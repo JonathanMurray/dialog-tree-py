@@ -86,25 +86,25 @@ def main():
                 _exit_game()
             elif event.type == pygame.KEYDOWN:
                 if is_dialog_shown:
-                    dialog_component.on_skip_text_button()
+                    dialog_component.skip_text()
                     if event.key == pygame.K_RETURN:
-                        dialog_component.on_action_button()
+                        dialog_component.commit_selected_choice()
                         if dialog_component.current_node_id() == dialog_closed_node_id:
                             is_dialog_shown = False
                     elif event.key == pygame.K_DOWN:
-                        dialog_component.on_delta_button(1)
+                        dialog_component.move_choice_selection(1)
                     elif event.key == pygame.K_UP:
-                        dialog_component.on_delta_button(-1)
+                        dialog_component.move_choice_selection(-1)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 ui_coordinates = translate_screen_to_ui_coordinates(dialog_rect, pygame.mouse.get_pos())
                 if ui_coordinates:
-                    dialog_component.on_mouse_click(ui_coordinates)
+                    dialog_component.commit_choice_at_position(ui_coordinates)
                     if dialog_component.current_node_id() == dialog_closed_node_id:
                         is_dialog_shown = False
             elif event.type == pygame.MOUSEMOTION:
                 ui_coordinates = translate_screen_to_ui_coordinates(dialog_rect, pygame.mouse.get_pos())
                 if ui_coordinates:
-                    dialog_component.on_mouse_hover(ui_coordinates)
+                    dialog_component.select_choice_at_position(ui_coordinates)
 
         if is_dialog_shown:
             dialog_component.update(elapsed_time)

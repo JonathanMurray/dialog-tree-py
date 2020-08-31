@@ -59,7 +59,7 @@ class Ui:
         self._components: List[Tuple[Component, Vec2]] = []
         self._dialog_box = None
         self._choice_buttons = []
-        self._active_choice_index = 0
+        self._highlighted_choice_index = 0
         self._screen_shake = ScreenShake()
 
         self.set_dialog(dialog_node)
@@ -91,9 +91,9 @@ class Ui:
         button_height = 40
         self._choice_buttons = [ChoiceButton(self._choice_font, (self._width, button_height), choice.text)
                                 for choice in self._dialog_node.choices]
-        self._active_choice_index = 0
+        self._highlighted_choice_index = 0
         if self._choice_buttons:
-            self._choice_buttons[self._active_choice_index].set_highlighted(True)
+            self._choice_buttons[self._highlighted_choice_index].set_highlighted(True)
         for i, button in enumerate(self._choice_buttons):
             j = len(self._choice_buttons) - i
             position = (0, self.surface.get_height() - button_height * j - 5 * j)
@@ -115,38 +115,30 @@ class Ui:
         if self._dialog_box.is_cursor_at_end() and not self._choice_buttons:
             self._add_choice_buttons()
 
-    def handle_delta_input(self, delta: int):
+    def move_choice_highlight(self, delta: int):
         if self._choice_buttons and len(self._choice_buttons) > 1:
+            new_index = (self._highlighted_choice_index + delta) % len(self._choice_buttons)
+            self.set_highlighted_choice(new_index)
+
+    def set_highlighted_choice(self, choice_index: int):
+        if choice_index != self._highlighted_choice_index:
             self._sound_player.play(self._select_blip_sound_id)
-            active_choice_index = (self._active_choice_index + delta) % len(self._choice_buttons)
-            self._set_active_choice_index(active_choice_index)
+            self._choice_buttons[self._highlighted_choice_index].set_highlighted(False)
+            self._highlighted_choice_index = choice_index
+            self._choice_buttons[self._highlighted_choice_index].set_highlighted(True)
 
-    def _set_active_choice_index(self, active_choice_index: int):
-        self._choice_buttons[self._active_choice_index].set_highlighted(False)
-        self._active_choice_index = active_choice_index
-        self._choice_buttons[self._active_choice_index].set_highlighted(True)
-
-    def handle_action_input(self) -> Optional[int]:
+    def highlighted_choice(self) -> Optional[int]:
         if self._choice_buttons:
-            return self._active_choice_index
+            return self._highlighted_choice_index
 
-    def handle_skip_text_input(self):
+    def skip_text(self):
         self._dialog_box.set_cursor_to_end()
 
-    def handle_mouse_click_input(self, ui_coordinates: Vec2) -> Optional[int]:
-        return self._get_intersecting_choice_button_index(ui_coordinates)
-
-    def handle_mouse_hover_input(self, ui_coordinates: Vec2):
-        choice_index = self._get_intersecting_choice_button_index(ui_coordinates)
-        if choice_index is not None and choice_index != self._active_choice_index:
-            self._sound_player.play(self._select_blip_sound_id)
-            self._set_active_choice_index(choice_index)
-
-    def _get_intersecting_choice_button_index(self, ui_coordinates: Vec2) -> Optional[int]:
+    def choice_button_at_position(self, target_position: Vec2) -> Optional[int]:
         for choice_index, (component, position) in enumerate((c for c in self._components
                                                               if isinstance(c[0], ChoiceButton))):
             rect = Rect(position, component.surface.get_size())
-            if rect.collidepoint(ui_coordinates):
+            if rect.collidepoint(target_position):
                 return choice_index
 
 

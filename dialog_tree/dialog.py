@@ -53,26 +53,28 @@ class DialogComponent:
         self._ui.update(elapsed_time)
         self._sound_player.update(elapsed_time)
 
-    def on_delta_button(self, delta: int):
-        self._ui.handle_delta_input(delta)
+    def skip_text(self):
+        self._ui.skip_text()
 
-    def on_skip_text_button(self):
-        self._ui.handle_skip_text_input()
+    def move_choice_selection(self, delta: int):
+        self._ui.move_choice_highlight(delta)
 
-    def on_action_button(self):
-        chosen_index = self._ui.handle_action_input()
+    def select_choice_at_position(self, ui_coordinates: Vec2):
+        chosen_index = self._ui.choice_button_at_position(ui_coordinates)
         if chosen_index is not None:
-            self._make_choice(chosen_index)
+            self._ui.set_highlighted_choice(chosen_index)
 
-    def on_mouse_click(self, ui_coordinates: Vec2):
-        chosen_index = self._ui.handle_mouse_click_input(ui_coordinates)
+    def commit_selected_choice(self):
+        chosen_index = self._ui.highlighted_choice()
         if chosen_index is not None:
-            self._make_choice(chosen_index)
+            self._commit_choice(chosen_index)
 
-    def on_mouse_hover(self, ui_coordinates: Vec2):
-        self._ui.handle_mouse_hover_input(ui_coordinates)
+    def commit_choice_at_position(self, ui_coordinates: Vec2):
+        chosen_index = self._ui.choice_button_at_position(ui_coordinates)
+        if chosen_index is not None:
+            self._commit_choice(chosen_index)
 
-    def _make_choice(self, chosen_index: int):
+    def _commit_choice(self, chosen_index: int):
         self._dialog_graph.make_choice(chosen_index)
         self._current_dialog_node = self._dialog_graph.current_node()
         self._play_dialog_sound()
