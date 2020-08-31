@@ -29,16 +29,15 @@ def _parse_sequence_json(sequence_json) -> DialogGraph:
     initial_step = sequence_json[0]
     next_text = "Next"
     nodes = [
-        DialogNode(root_id, initial_step[0], NodeGraphics(image_ids=[initial_step[1]]),
-                   [DialogChoice(next_text, "1")])]
+        DialogNode(root_id, initial_step[0], [DialogChoice(next_text, "1")], NodeGraphics(image_ids=[initial_step[1]]))]
     for i in range(1, len(sequence_json) - 1):
         step = sequence_json[i]
         nodes.append(
-            DialogNode(str(i), step[0], NodeGraphics(image_ids=[step[1]]), [DialogChoice(next_text, str(i + 1))]))
+            DialogNode(str(i), step[0], [DialogChoice(next_text, str(i + 1))], NodeGraphics(image_ids=[step[1]])))
     last_step = sequence_json[-1]
     nodes.append(
-        DialogNode(str(len(sequence_json) - 1), last_step[0], NodeGraphics(image_ids=[last_step[1]]),
-                   [DialogChoice("Play from beginning", root_id)]))
+        DialogNode(str(len(sequence_json) - 1), last_step[0],
+                   [DialogChoice("Play from beginning", root_id)], NodeGraphics(image_ids=[last_step[1]]), ))
     return DialogGraph(root_id, nodes)
 
 
@@ -46,24 +45,25 @@ def _parse_graph_json(graph_json) -> DialogGraph:
     def parse_choice(array: List[str]) -> DialogChoice:
         return DialogChoice(array[0], array[1])
 
-    def parse_node(node) -> DialogNode:
-        graphics = node["graphics"]
+    def parse_graphics(graphics) -> NodeGraphics:
         offset = graphics.get("offset", None)
         screen_shake = Millis(graphics["screen_shake"]) if "screen_shake" in graphics else None
         instant_text = graphics.get("instant_text", False)
         if "image" in graphics:
-            node_graphics = NodeGraphics(image_ids=[graphics["image"]], offset=offset, screen_shake=screen_shake,
-                                         instant_text=instant_text)
+            return NodeGraphics(image_ids=[graphics["image"]], offset=offset, screen_shake=screen_shake,
+                                instant_text=instant_text)
         elif "animation" in graphics:
-            node_graphics = NodeGraphics(animation_id=graphics["animation"], offset=offset,
-                                         screen_shake=screen_shake, instant_text=instant_text)
+            return NodeGraphics(animation_id=graphics["animation"], offset=offset,
+                                screen_shake=screen_shake, instant_text=instant_text)
         else:
             raise ValueError(f"Missing image/animation config for node!")
+
+    def parse_node(node) -> DialogNode:
         return DialogNode(
             node_id=node["id"],
             text=node["text"],
-            graphics=node_graphics,
             choices=[parse_choice(choice) for choice in node["choices"]],
+            graphics=parse_graphics(node["graphics"]) if "graphics" in node else None,
             sound_id=node.get("sound", None))
 
     return DialogGraph(graph_json["root"], [parse_node(node) for node in graph_json["nodes"]])

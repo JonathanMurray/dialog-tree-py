@@ -22,14 +22,14 @@ class NodeGraphics:
 
 
 class DialogNode:
-    def __init__(self, node_id: str, text: str, graphics: NodeGraphics, choices: List[DialogChoice],
+    def __init__(self, node_id: str, text: str, choices: List[DialogChoice], graphics: Optional[NodeGraphics] = None,
         sound_id: Optional[str] = None):
         if not node_id:
             raise ValueError("Invalid node config (missing ID)")
         self.node_id = node_id
         self.text = text
-        self.graphics = graphics
         self.choices = choices
+        self.graphics = graphics
         self.sound_id = sound_id
 
 

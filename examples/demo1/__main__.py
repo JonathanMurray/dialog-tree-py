@@ -45,14 +45,16 @@ def main():
                 text="This is a minimal demo app. Let this text slowly appear or click any key to skip it. "
                      "Use the UP/DOWN keys to switch between your dialog choices, and click RETURN to go "
                      "for that choice. Or you could just use the mouse!",
-                graphics=NodeGraphics(animation_id="demo1_animation"),
                 choices=[DialogChoice("See this dialog again", "ROOT"),
-                         DialogChoice("Close dialog", dialog_closed_node_id)]),
+                         DialogChoice("Close dialog", dialog_closed_node_id)],
+                graphics=NodeGraphics(animation_id="demo1_animation")
+            ),
             DialogNode(
                 node_id=dialog_closed_node_id,
                 text="",
-                graphics=NodeGraphics(animation_id="demo1_animation"),
-                choices=[]),
+                choices=[],
+                graphics=NodeGraphics(animation_id="demo1_animation")
+            ),
 
         ],
         title="DEMO 1",
