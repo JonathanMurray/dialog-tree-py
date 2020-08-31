@@ -87,29 +87,6 @@ def test_load_graph_with_animation():
                     "id": "1",
                     "text": "text 1",
                     "graphics": {
-                        "animation": ["frame 1", "frame 2"],
-                    },
-                    "choices": []
-                }
-            ]
-        }
-    }
-    dialog_graph = parse_dialog_from_json(dialog_json)
-
-    assert dialog_graph.current_node().text == "text 1"
-    assert dialog_graph.current_node().graphics.image_ids == ["frame 1", "frame 2"]
-    assert dialog_graph.current_node().choices == []
-
-
-def test_load_graph_with_animation():
-    dialog_json = {
-        "graph": {
-            "root": "1",
-            "nodes": [
-                {
-                    "id": "1",
-                    "text": "text 1",
-                    "graphics": {
                         "animation": "animation 1",
                     },
                     "choices": []

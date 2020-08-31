@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import pygame
 from pygame.font import Font
@@ -7,7 +7,7 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 from pygame.time import Clock
 
-from constants import Millis, Vec2, Vec3
+from constants import Millis, Vec2, Vec3, BLACK, WHITE
 from dialog import DialogComponent
 from graph import DialogGraph, DialogNode, NodeGraphics, DialogChoice
 from sound import SoundPlayer
@@ -18,24 +18,42 @@ def main():
     font = Font("examples/demo1/demo_font.dfont", 13)
 
     screen_size = (500, 500)
-    picture_component_size = (500, 200)
+    dialog_margin = 30
+    dialog_padding = 5
+    outer_dialog_size = (screen_size[0] - dialog_margin * 2, 330)
+    dialog_size = (outer_dialog_size[0] - dialog_padding * 2, outer_dialog_size[1] - dialog_padding * 2)
+    picture_component_size = (dialog_size[0], 200)
 
     screen = pygame.display.set_mode(screen_size)
+    dialog_surface = Surface(dialog_size)
+    dialog_pos = (dialog_margin + dialog_padding, dialog_margin + dialog_padding)
+    dialog_rect = Rect(dialog_pos, dialog_size)
 
     images = {"demo1_background": filled_surface(picture_component_size, (0, 50, 35))}
     animations = {"demo1_animation": create_animation(picture_component_size)}
-    blip_sound = Sound("examples/demo1/blip.ogg")
+    text_blip_sound = Sound("examples/demo1/blip.ogg")
+    select_blip_sound = Sound("examples/demo1/blip_2.ogg")
     select_blip_sound_id = "blip"
-    sound_player = SoundPlayer(sounds={select_blip_sound_id: blip_sound}, text_blip_sound=blip_sound)
+    sound_player = SoundPlayer(sounds={select_blip_sound_id: select_blip_sound}, text_blip_sound=text_blip_sound)
 
+    dialog_closed_node_id = "DIALOG_CLOSED"
     dialog_graph = DialogGraph(
         root_node_id="ROOT",
         nodes=[
             DialogNode(
                 node_id="ROOT",
-                text="This is a minimal demo app. Let this text slowly appear OR click any key to skip it.",
+                text="This is a minimal demo app. Let this text slowly appear or click any key to skip it. "
+                     "Use the UP/DOWN keys to switch between your dialog choices, and click RETURN to go "
+                     "for that choice. Or you could just use the mouse!",
                 graphics=NodeGraphics(animation_id="demo1_animation"),
-                choices=[DialogChoice("See this dialog again", "ROOT"), DialogChoice("Restart", "ROOT")])
+                choices=[DialogChoice("See this dialog again", "ROOT"),
+                         DialogChoice("Close dialog", dialog_closed_node_id)]),
+            DialogNode(
+                node_id=dialog_closed_node_id,
+                text="",
+                graphics=NodeGraphics(animation_id="demo1_animation"),
+                choices=[]),
+
         ],
         title="DEMO 1",
         background_image_id="demo1_background"
@@ -44,7 +62,7 @@ def main():
     pygame.display.set_caption(dialog_graph.title)
 
     dialog_component = DialogComponent(
-        surface=screen,
+        surface=dialog_surface,
         dialog_font=font,
         choice_font=font,
         images=images,
@@ -57,6 +75,8 @@ def main():
 
     clock = Clock()
 
+    is_dialog_shown = True
+
     while True:
 
         elapsed_time = Millis(clock.tick())
@@ -64,26 +84,53 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 _exit_game()
-            if event.type == pygame.KEYDOWN:
-                dialog_component.on_skip_text_button()
-                if event.key == pygame.K_RETURN:
-                    dialog_component.on_action_button()
-                elif event.key == pygame.K_DOWN:
-                    dialog_component.on_delta_button(1)
-                elif event.key == pygame.K_UP:
-                    dialog_component.on_delta_button(-1)
+            elif event.type == pygame.KEYDOWN:
+                if is_dialog_shown:
+                    dialog_component.skip_text()
+                    if event.key == pygame.K_RETURN:
+                        dialog_component.commit_selected_choice()
+                        if dialog_component.current_node_id() == dialog_closed_node_id:
+                            is_dialog_shown = False
+                    elif event.key == pygame.K_DOWN:
+                        dialog_component.move_choice_selection(1)
+                    elif event.key == pygame.K_UP:
+                        dialog_component.move_choice_selection(-1)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                ui_coordinates = translate_screen_to_ui_coordinates(dialog_rect, pygame.mouse.get_pos())
+                if ui_coordinates:
+                    dialog_component.commit_choice_at_position(ui_coordinates)
+                    if dialog_component.current_node_id() == dialog_closed_node_id:
+                        is_dialog_shown = False
+            elif event.type == pygame.MOUSEMOTION:
+                ui_coordinates = translate_screen_to_ui_coordinates(dialog_rect, pygame.mouse.get_pos())
+                if ui_coordinates:
+                    dialog_component.select_choice_at_position(ui_coordinates)
 
-        dialog_component.update(elapsed_time)
+        if is_dialog_shown:
+            dialog_component.update(elapsed_time)
+            dialog_component.redraw()
 
-        dialog_component.redraw()
-
-        screen.blit(dialog_component.surface, (0, 0))
+        screen.fill(BLACK)
+        if is_dialog_shown:
+            screen.blit(dialog_component.surface, dialog_pos)
+        pygame.draw.rect(screen, (255, 100, 100), Rect((dialog_margin, dialog_margin), outer_dialog_size), width=1)
 
         fps_string = str(int(clock.get_fps())).rjust(3, ' ')
-        rendered_fps = font.render(f"FPS: {fps_string}", True, (255, 255, 255), (0, 0, 0))
+        rendered_fps = font.render(f"FPS: {fps_string}", True, WHITE, (0, 0, 0))
         screen.blit(rendered_fps, (5, 5))
 
+        screen.blit(font.render("The dialog library is confined to the red rectangle above.", True, WHITE), (15, 400))
+        screen.blit(font.render("This text is handled separately from the dialog.", True, WHITE), (15, 430))
+        if not is_dialog_shown:
+            screen.blit(font.render("Oops, you closed the dialog. Restart app to see it again.", True, (255, 150, 150)),
+                        (15, 460))
+
         pygame.display.update()
+
+
+def translate_screen_to_ui_coordinates(ui_rect: Rect, screen_coordinates: Vec2) -> Optional[Vec2]:
+    if ui_rect.collidepoint(screen_coordinates[0], screen_coordinates[1]):
+        return screen_coordinates[0] - ui_rect.x, screen_coordinates[1] - ui_rect.y
 
 
 def create_animation(size: Vec2) -> List[Surface]:
