@@ -71,7 +71,7 @@ class App:
         pygame.display.update()
 
 
-def start(dialog_filename: Optional[str] = None):
+def start(dialog_filepath: Optional[str] = None):
     pygame.init()
     dialog_font = Font(f"{FONT_DIR}/Monaco.dfont", 17)
     choice_font = Font(f"{FONT_DIR}/Monaco.dfont", 15)
@@ -79,11 +79,11 @@ def start(dialog_filename: Optional[str] = None):
     images, animations = load_images()
     sounds = load_sounds()
     sound_player = SoundPlayer(sounds, sounds["text_blip"])
-    dialog_filename = dialog_filename or "wikipedia_example.json"
-    dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
+    dialog_filepath = dialog_filepath or str(Path(DIALOG_DIR).joinpath("wikipedia_example.json"))
+    dialog_graph = load_dialog_from_file(dialog_filepath)
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
-    pygame.display.set_caption(dialog_graph.title or dialog_filename)
+    pygame.display.set_caption(dialog_graph.title or dialog_filepath)
     app = App(screen, dialog_font, choice_font, images, animations, sound_player, dialog_graph)
     app.run()
 

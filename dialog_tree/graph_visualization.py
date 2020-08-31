@@ -48,10 +48,10 @@ def _init_tmp_dir():
 
 def main():
     args = sys.argv[1:]
-    dialog_filename = args[0] if args else "wikipedia_example.json"
-    dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
+    dialog_filepath = args[0] if args else str(Path(DIALOG_DIR).joinpath("wikipedia_example.json"))
+    dialog_graph = load_dialog_from_file(dialog_filepath)
     _init_tmp_dir()
-    graph = generate_graphviz(dialog_filename, dialog_graph)
+    graph = generate_graphviz(Path(dialog_filepath).name, dialog_graph)
     graph.render(directory=TMP_DIR, view=True)
     print(f"Saved rendered outputs in: {TMP_DIR}")
 

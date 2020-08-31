@@ -31,15 +31,15 @@ pip3 install -r requirements.txt
 To run a dialog, use:
 
 ```bash
-./run wikipedia_example.json
+./run resources/dialog/wikipedia_example.json
 ```
 
-or more generally `./run <FILE>` where `<FILE>` is a valid JSON configuration file placed in the directory `resources/dialog`.
+or more generally `./run <FILE>` where `<FILE>` is a valid JSON configuration file.
 
 To see a visual graph representation of the dialog tree, use:
 
 ```bash
-./inspect wikipedia_example.json
+./inspect resources/dialog/wikipedia_example.json
 # This requires you to have graphviz installed on your machine
 ```
 
