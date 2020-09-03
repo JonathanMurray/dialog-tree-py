@@ -15,9 +15,7 @@ from graph import DialogGraph
 from sound import SoundPlayer
 
 FONT_DIR = "resources/fonts"
-DEFAULT_IMG_DIR = "resources/images"
-DEFAULT_SOUND_DIR = "resources/sounds"
-DIALOG_DIR = "resources/dialog"
+SOUND_DIR = "resources/sounds"
 
 UI_MARGIN = 3
 SCREEN_SIZE = 500, 500
@@ -74,9 +72,6 @@ class App:
 
 
 def start(dialog_filepath: Optional[str] = None, image_dir: Optional[str] = None, sound_dir: Optional[str] = None):
-    dialog_filepath = dialog_filepath or str(Path(DIALOG_DIR).joinpath("wikipedia_example.json"))
-    image_dir = image_dir or DEFAULT_IMG_DIR
-    sound_dir = sound_dir or DEFAULT_SOUND_DIR
 
     pygame.init()
     dialog_font = Font(f"{FONT_DIR}/Monaco.dfont", 17)
@@ -100,8 +95,8 @@ def start(dialog_filepath: Optional[str] = None, image_dir: Optional[str] = None
     select_blip_sound_id = "select_blip.ogg"
     sound_ids = [n.sound_id for n in dialog_graph.nodes() if n.sound_id is not None]
     sounds = load_sounds(sound_dir, sound_ids)
-    sounds[text_blip_sound_id] = load_sound_file(str(Path(DEFAULT_SOUND_DIR).joinpath(text_blip_sound_id)))
-    sounds[select_blip_sound_id] = load_sound_file(str(Path(DEFAULT_SOUND_DIR).joinpath(select_blip_sound_id)))
+    sounds[text_blip_sound_id] = load_sound_file(str(Path(SOUND_DIR).joinpath(text_blip_sound_id)))
+    sounds[select_blip_sound_id] = load_sound_file(str(Path(SOUND_DIR).joinpath(select_blip_sound_id)))
 
     sound_player = SoundPlayer(sounds, sounds[text_blip_sound_id])
 
@@ -172,8 +167,8 @@ def main():
     args = vars(parser.parse_args())
 
     dialog_filepath = args.get("json_file", None)
-    image_dir = args.get("image_dir", None)
-    sound_dir = args.get("sound_dir", None)
+    image_dir = args["image_dir"]
+    sound_dir = args["sound_dir"]
 
     print("Starting application...")
     print(f"dialog filepath={dialog_filepath}")

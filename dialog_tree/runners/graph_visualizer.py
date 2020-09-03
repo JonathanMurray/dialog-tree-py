@@ -9,7 +9,6 @@ from graph import DialogGraph
 from text_util import layout_text_in_area
 
 TMP_DIR = Path(".tmpfiles")
-DIALOG_DIR = "resources/dialog"
 
 
 def generate_graphviz(graph_name: str, dialog_graph: DialogGraph) -> Digraph:
@@ -47,7 +46,7 @@ def _init_tmp_dir():
 
 def main():
     args = sys.argv[1:]
-    dialog_filepath = args[0] if args else str(Path(DIALOG_DIR).joinpath("wikipedia_example.json"))
+    dialog_filepath = args[0]
     dialog_graph = load_dialog_from_file(dialog_filepath)
     _init_tmp_dir()
     graph = generate_graphviz(Path(dialog_filepath).name, dialog_graph)

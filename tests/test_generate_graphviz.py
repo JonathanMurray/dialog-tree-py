@@ -1,5 +1,5 @@
 from graph import DialogGraph, DialogNode, DialogChoice, NodeGraphics
-from graph_visualization import generate_graphviz
+from runners.graph_visualizer import generate_graphviz
 
 
 def test_simple_graphviz():
