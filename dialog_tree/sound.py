@@ -34,3 +34,6 @@ class SoundPlayer:
     @staticmethod
     def stop_all_playing_sounds():
         pygame.mixer.fadeout(250)
+
+    def has_sound(self, sound_id: str):
+        return sound_id in self._sounds

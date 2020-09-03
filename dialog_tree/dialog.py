@@ -14,7 +14,7 @@ class DialogComponent:
     def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph, picture_size: Vec2,
         select_blip_sound_id: str):
-        self._validate_inputs(dialog_graph, images)
+        self._validate_inputs(dialog_graph, images, sound_player)
         self.surface = surface
         self._sound_player = sound_player
         self._dialog_graph = dialog_graph
@@ -38,13 +38,17 @@ class DialogComponent:
         self._play_dialog_sound()
 
     @staticmethod
-    def _validate_inputs(dialog_graph: DialogGraph, images: Dict[str, Surface]):
+    def _validate_inputs(dialog_graph: DialogGraph, images: Dict[str, Surface], sound_player: SoundPlayer):
         for node in dialog_graph.nodes():
             if node.graphics.image_ids:
                 for image_id in node.graphics.image_ids:
                     if image_id not in images:
                         raise ValueError(
                             f"Invalid config! Graph node '{node.node_id}' refers to missing image: '{image_id}'")
+            if node.sound_id:
+                if not sound_player.has_sound(node.sound_id):
+                    raise ValueError(
+                        f"Invalid config! Graph node '{node.node_id}' refers to missing sound: '{node.sound_id}")
         background_id = dialog_graph.background_image_id
         if background_id and background_id not in images:
             raise ValueError(f"Invalid config! Graph refers to missing background image: '{background_id}'")

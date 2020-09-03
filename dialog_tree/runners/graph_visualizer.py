@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import sys
 from pathlib import Path
@@ -10,7 +9,6 @@ from graph import DialogGraph
 from text_util import layout_text_in_area
 
 TMP_DIR = Path(".tmpfiles")
-DIALOG_DIR = "resources/dialog"
 
 
 def generate_graphviz(graph_name: str, dialog_graph: DialogGraph) -> Digraph:
@@ -48,10 +46,10 @@ def _init_tmp_dir():
 
 def main():
     args = sys.argv[1:]
-    dialog_filename = args[0] if args else "wikipedia_example.json"
-    dialog_graph = load_dialog_from_file(f"{DIALOG_DIR}/{dialog_filename}")
+    dialog_filepath = args[0]
+    dialog_graph = load_dialog_from_file(dialog_filepath)
     _init_tmp_dir()
-    graph = generate_graphviz(dialog_filename, dialog_graph)
+    graph = generate_graphviz(Path(dialog_filepath).name, dialog_graph)
     graph.render(directory=TMP_DIR, view=True)
     print(f"Saved rendered outputs in: {TMP_DIR}")
 

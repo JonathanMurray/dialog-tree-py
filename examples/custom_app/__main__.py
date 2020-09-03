@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Optional
 
 import pygame
@@ -15,7 +16,8 @@ from sound import SoundPlayer
 
 def main():
     pygame.init()
-    font = Font("examples/demo1/demo_font.dfont", 13)
+    directory = Path(__file__).parent
+    font = Font(str(directory.joinpath("demo_font.dfont")), 13)
 
     screen_size = (500, 500)
     dialog_margin = 30
@@ -31,8 +33,8 @@ def main():
 
     images = {"demo1_background": filled_surface(picture_component_size, (0, 50, 35))}
     animations = {"demo1_animation": create_animation(picture_component_size)}
-    text_blip_sound = Sound("examples/demo1/blip.ogg")
-    select_blip_sound = Sound("examples/demo1/blip_2.ogg")
+    text_blip_sound = load_sound("blip.ogg")
+    select_blip_sound = load_sound("blip_2.ogg")
     select_blip_sound_id = "blip"
     sound_player = SoundPlayer(sounds={select_blip_sound_id: select_blip_sound}, text_blip_sound=text_blip_sound)
 
@@ -128,6 +130,13 @@ def main():
                         (15, 460))
 
         pygame.display.update()
+
+
+def load_sound(filename: str):
+    filepath = str(Path(__file__).parent.joinpath(filename))
+    sound = Sound(filepath)
+    sound.set_volume(0.2)
+    return sound
 
 
 def translate_screen_to_ui_coordinates(ui_rect: Rect, screen_coordinates: Vec2) -> Optional[Vec2]:

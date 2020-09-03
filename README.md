@@ -28,18 +28,32 @@ pip3 install -r requirements.txt
 
 ## Usage
 
-To run a dialog, use:
+Dialog-Tree is both a library and a tool. Check out the examples for getting a sense of how it can
+be used.
 
+These examples demonstrate how to use the provided dialog-runner by supplying it with your own
+configuration and resources
 ```bash
-./run wikipedia_example.json
+# Animated dialog based on JSON configuration, using custom sound/image resources
+examples/animated_dialog/run.sh
+
+# Simple slideshow based on JSON configuration, using custom image resources
+examples/slideshow/run.sh
 ```
 
-or more generally `./run <FILE>` where `<FILE>` is a valid JSON configuration file placed in the directory `resources/dialog`.
+These examples demonstrate how to use Dialog-Tree as a Python library in your own code-base
+```bash
+# An example Pygame app that sets up a dialog surface along with other content on the screen
+python3 examples/custom_app
 
-To see a visual graph representation of the dialog tree, use:
+# A text-based adventure game that uses the graph parts of the library but none of the UI parts
+python3 examples/text_adventure_game
+``` 
+
+To see a visual graph representation of a dialog configuration file, use:
 
 ```bash
-./inspect wikipedia_example.json
+./inspect.sh examples/animated_dialog/wikipedia.json
 # This requires you to have graphviz installed on your machine
 ```
 
