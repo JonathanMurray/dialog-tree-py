@@ -1,6 +1,6 @@
 {
   "title": "en.wikipedia.org/wiki/Dialogue_tree",
-  "background_image_id": "lawyer_background",
+  "background_image_id": "lawyer_background.png",
   "graph": {
     "root": "START",
     "nodes": [
@@ -70,10 +70,10 @@
       {
         "id": "LIAR_1",
         "text": "",
-        "sound": "hold_it",
+        "sound": "hold_it.ogg",
         "graphics": {
           "screen_shake": 300,
-          "image": "hold_it"
+          "image": "hold_it.png"
         },
         "choices": [
           [
@@ -119,10 +119,10 @@
       {
         "id": "GAME_OVER",
         "text": "",
-        "sound": "take_that",
+        "sound": "take_that.ogg",
         "graphics": {
           "screen_shake": 300,
-          "image": "take_that"
+          "image": "take_that.png"
         },
         "choices": [
           [
@@ -134,7 +134,7 @@
       {
         "id": "VICTORY",
         "text": "[YOU WON]",
-        "sound": "applause",
+        "sound": "applause.ogg",
         "graphics": {
           "animation": "lawyer_triumph",
           "offset": [
