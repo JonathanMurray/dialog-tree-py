@@ -14,7 +14,7 @@ from text_util import layout_text_in_area
 from timing import PeriodicAction
 
 
-class Component(ABC):
+class _Component(ABC):
     def __init__(self, surface: Surface):
         self.surface = surface
 
@@ -22,7 +22,7 @@ class Component(ABC):
         pass
 
 
-class ScreenShake:
+class _ScreenShake:
     def __init__(self):
         self.x = 0
         self.y = 0
@@ -40,6 +40,7 @@ class ScreenShake:
 
 
 class Ui:
+    """The graphical user interface used for presenting a dialog on the screen"""
     def __init__(self, surface: Surface, picture_size: Vec2, dialog_node: DialogNode, dialog_font: Font,
         choice_font: Font, images: Dict[str, Surface], animations: Dict[str, List[Surface]], sound_player: SoundPlayer,
         background: Optional[Surface], select_blip_sound_id: str):
@@ -56,11 +57,11 @@ class Ui:
 
         # MUTABLE STATE BELOW
         self._dialog_node = dialog_node
-        self._components: List[Tuple[Component, Vec2]] = []
+        self._components: List[Tuple[_Component, Vec2]] = []
         self._dialog_box = None
         self._choice_buttons = []
         self._highlighted_choice_index = 0
-        self._screen_shake = ScreenShake()
+        self._screen_shake = _ScreenShake()
 
         self.set_dialog(dialog_node)
 
@@ -69,14 +70,14 @@ class Ui:
 
         graphics = dialog_node.graphics
         if graphics.image_ids:
-            animation = Animation([self._images[i] for i in graphics.image_ids], graphics.offset)
+            animation = _Animation([self._images[i] for i in graphics.image_ids], graphics.offset)
         else:
-            animation = Animation(self._animations[graphics.animation_id], graphics.offset)
+            animation = _Animation(self._animations[graphics.animation_id], graphics.offset)
         margin = 5
         dialog_box_size = (self._width - margin * 2, 120)
-        self._components = [(Picture(Surface(self._picture_size), self._background, animation), (0, 0))]
+        self._components = [(_Picture(Surface(self._picture_size), self._background, animation), (0, 0))]
         if dialog_node.text:
-            self._dialog_box = TextBox(
+            self._dialog_box = _TextBox(
                 self._dialog_font, dialog_box_size, dialog_node.text,
                 border_color=(150, 150, 150), text_color=(255, 255, 255), sound_player=self._sound_player)
             self._components.append(
@@ -89,7 +90,7 @@ class Ui:
 
     def _add_choice_buttons(self):
         button_height = 40
-        self._choice_buttons = [ChoiceButton(self._choice_font, (self._width, button_height), choice.text)
+        self._choice_buttons = [_ChoiceButton(self._choice_font, (self._width, button_height), choice.text)
                                 for choice in self._dialog_node.choices]
         self._highlighted_choice_index = 0
         if self._choice_buttons:
@@ -136,13 +137,13 @@ class Ui:
 
     def choice_button_at_position(self, target_position: Vec2) -> Optional[int]:
         for choice_index, (component, position) in enumerate((c for c in self._components
-                                                              if isinstance(c[0], ChoiceButton))):
+                                                              if isinstance(c[0], _ChoiceButton))):
             rect = Rect(position, component.surface.get_size())
             if rect.collidepoint(target_position):
                 return choice_index
 
 
-class Animation:
+class _Animation:
     def __init__(self, frames: List[Surface], offset: Vec2):
         if not frames:
             raise ValueError("Cannot instantiate animation without frames!")
@@ -157,9 +158,9 @@ class Animation:
         return self._frames[self._frame_index]
 
 
-class Picture(Component):
+class _Picture(_Component):
 
-    def __init__(self, surface: Surface, background: Optional[Surface], animation: Animation):
+    def __init__(self, surface: Surface, background: Optional[Surface], animation: _Animation):
         super().__init__(surface)
         self._background = background
         self._animation = animation
@@ -180,7 +181,7 @@ class Picture(Component):
         self._periodic_frame_change.update(elapsed_time)
 
 
-class ChoiceButton(Component):
+class _ChoiceButton(_Component):
     def __init__(self, font: Font, size: Vec2, text: str, highlighted: bool = False):
         super().__init__(Surface(size))
 
@@ -208,7 +209,7 @@ class ChoiceButton(Component):
         self._redraw()
 
 
-class TextBox(Component):
+class _TextBox(_Component):
     def __init__(self, font: Font, size: Vec2, text: str, border_color: Vec3, text_color: Vec3,
         sound_player: SoundPlayer):
         super().__init__(Surface(size))

@@ -10,6 +10,12 @@ from ui import Ui
 
 
 class DialogComponent:
+    """
+    A graphical Pygame component that represents a dialog tree
+
+    Display this component to the screen by blitting its publicly accessible surface. Make sure to call redraw() so that
+    the graphics are updated. Call update(ms) to have it respond to time passing.
+    """
 
     def __init__(self, surface: Surface, dialog_font: Font, choice_font: Font, images: Dict[str, Surface],
         animations: Dict[str, List[Surface]], sound_player: SoundPlayer, dialog_graph: DialogGraph, picture_size: Vec2,

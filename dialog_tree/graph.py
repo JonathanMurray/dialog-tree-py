@@ -34,6 +34,12 @@ class DialogNode:
 
 
 class DialogGraph:
+    """
+    A graph representation of a dialog
+
+    This class is very central. One instance represents a full dialog. It keeps track of where you are as you progress
+    through a dialog.
+    """
     def __init__(self, root_node_id: str, nodes: List[DialogNode], title: Optional[str] = None,
         background_image_id: Optional[str] = None):
         self.title = title
