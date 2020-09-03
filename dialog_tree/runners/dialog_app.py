@@ -10,7 +10,7 @@ from pygame.surface import Surface
 
 from config_file import load_dialog_from_file
 from constants import BLACK, Millis
-from dialog import DialogComponent
+from dialog_component import DialogComponent
 from graph import DialogGraph
 from sound import SoundPlayer
 

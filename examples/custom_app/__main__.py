@@ -9,7 +9,7 @@ from pygame.surface import Surface
 from pygame.time import Clock
 
 from constants import Millis, Vec2, Vec3, BLACK, WHITE
-from dialog import DialogComponent
+from dialog_component import DialogComponent
 from graph import DialogGraph, DialogNode, NodeGraphics, DialogChoice
 from sound import SoundPlayer
 
